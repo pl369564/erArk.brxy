@@ -636,7 +636,7 @@ def character_aotu_change_value(character_id: int, now_time: datetime.datetime, 
     true_add_time = max(true_add_time, 0)
 
     # 结算疲劳值
-    tired_change = int(true_add_time / 6)
+    tired_change = int(true_add_time / 12)
     # 基础行动结算1疲劳值
     if true_add_time == 5:
         tired_change = 1
