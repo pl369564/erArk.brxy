@@ -435,7 +435,7 @@ def get_new_character(character_id: int, visitor_flag: bool = False):
                 cache.rhodes_island.facility_open[open_cid] = True
 
     # 分配角色宿舍
-    if visitor_flag == False:
+    if True: #visitor_flag == False:
         new_character_get_dormitory(character_id)
     # 客人则分配客房
     else:

@@ -5394,7 +5394,12 @@ def handle_target_add_small_disgust(
     target_data: game_type.Character = cache.character_data[character_data.target_character_id]
     if character_id != 0 and character_data.target_character_id != 0:
         return
-    base_chara_state_common_settle(character_data.target_character_id, add_time, 20, 5, ability_level = target_data.ability[18], change_data_to_target_change = change_data)
+    
+    alevel = character_data.status_data[18] - character_data.status_data[13] - character_data.status_data[14] - character_data.status_data[15]
+    if alevel < 0:
+        alevel = 0
+
+    base_chara_state_common_settle(character_data.target_character_id, add_time, 20, 5, ability_level = alevel, change_data_to_target_change = change_data)
 
 
 @settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.ADD_SMALL_P_FEEL)

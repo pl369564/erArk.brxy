@@ -100,7 +100,7 @@ def character_move(character_id: int, target_scene: list) -> (str, list, list, i
                 info_draw = draw.WaitDraw()
                 info_draw.text = _("\n  ●你拿出了一次性万能钥匙，悄悄打开了门\n\n")
                 info_draw.draw()
-                character_data.item[152] -= 1
+                character_data.item[152] -= 0
                 now_scene_data.close_flag = 0
                 access_type = "open"
         # 其他不可进入情况

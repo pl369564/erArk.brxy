@@ -1193,7 +1193,11 @@ def handle_add_small_disgust(
 
     character_data: game_type.Character = cache.character_data[character_id]
 
-    default.base_chara_state_common_settle(character_id, 0, 20, 20, ability_level = character_data.ability[18], change_data = change_data)
+    alevel = character_data.status_data[18] - character_data.status_data[13] - character_data.status_data[14] - character_data.status_data[15]
+    if alevel < 0:
+        alevel = 0
+
+    default.base_chara_state_common_settle(character_id, 0, 20, 20, ability_level = alevel, change_data = change_data)
 
 
 @settle_behavior.add_settle_second_behavior_effect(constant_effect.SecondEffect.ADD_MIDDLE_N_FEEL)
@@ -1765,7 +1769,11 @@ def handle_add_middle_disgust(
 
     character_data: game_type.Character = cache.character_data[character_id]
 
-    default.base_chara_state_common_settle(character_id, 0, 20, 100, ability_level = character_data.ability[18], change_data = change_data)
+    alevel = character_data.status_data[18] - character_data.status_data[13] - character_data.status_data[14] - character_data.status_data[15]
+    if alevel < 0:
+        alevel = 0
+
+    default.base_chara_state_common_settle(character_id, 0, 20, 100, ability_level = alevel, change_data = change_data)
 
 
 @settle_behavior.add_settle_second_behavior_effect(constant_effect.SecondEffect.ADD_LARGE_N_FEEL)
@@ -2314,8 +2322,12 @@ def handle_add_large_disgust(
 
     character_data: game_type.Character = cache.character_data[character_id]
 
+    alevel = character_data.status_data[18] - character_data.status_data[13] - character_data.status_data[14] - character_data.status_data[15]
+    if alevel < 0:
+        alevel = 0
+
     now_add_lust = 1000
-    adjust = attr_calculation.get_mark_debuff_adjust(character_data.ability[18])
+    adjust = attr_calculation.get_mark_debuff_adjust(alevel)
     now_add_lust *= adjust
 
     character_data.status_data[20] += now_add_lust

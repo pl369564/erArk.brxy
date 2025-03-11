@@ -210,13 +210,13 @@ def calculation_favorability(character_id: int, target_character_id: int, favora
     # 恐怖、抑郁、反感每级-0.3倍#
     for i in {18, 19, 20}:
         status_level = attr_calculation.get_status_level(target_data.status_data[i])
-        fix -= status_level * 0.3
+        fix -= status_level * 0.1
 
     # 能力相关计算#
     # 亲密、快乐刻印、屈服刻印每级+0.2倍#
     for i in {13, 14, 32}:
         ability_level = target_data.ability[i]
-        fix += ability_level * 0.2
+        fix += ability_level * 0.3
     # 苦痛刻印、恐怖刻印每级-0.3倍#
     for i in {15, 17}:
         ability_level = target_data.ability[i]
@@ -224,7 +224,7 @@ def calculation_favorability(character_id: int, target_character_id: int, favora
     # 反发刻印每级-1.0倍#
     for i in {18}:
         ability_level = target_data.ability[i]
-        fix -= ability_level * 1.0
+        fix -= ability_level * 0.2
 
     # 素质相关计算#
     # 爱情与隶属系加成0.5~2.0#
@@ -378,7 +378,7 @@ def calculation_instuct_judege(character_id: int, target_character_id: int, inst
     add_status_level_sum_l =  attr_calculation.get_status_level(target_data.status_data[10]) + attr_calculation.get_status_level(target_data.status_data[15])
     down_status_level_sum_s = attr_calculation.get_status_level(target_data.status_data[16]) + attr_calculation.get_status_level(target_data.status_data[19])
     down_status_level_sum_l = attr_calculation.get_status_level(target_data.status_data[17]) + attr_calculation.get_status_level(target_data.status_data[18]) + attr_calculation.get_status_level(target_data.status_data[20])
-    judge_status = add_status_level_sum_s * 5 +  add_status_level_sum_l * 10 - down_status_level_sum_s * 5 - down_status_level_sum_l * 10
+    judge_status = add_status_level_sum_s * 15 +  add_status_level_sum_l * 30 - down_status_level_sum_s * 5 + down_status_level_sum_l * 10
     judge += judge_status
     if judge_status:
         calculation_text += _("+状态修正(") + str(judge_status) + ")"
@@ -391,7 +391,7 @@ def calculation_instuct_judege(character_id: int, target_character_id: int, inst
 
     # 刻印修正，快乐(13)、屈服(14)、苦痛(15)、时停(16)、恐怖(17)、反发(18)、无觉(19)修正#
     judge_mark = target_data.ability[13] * 50 + target_data.ability[14] * 50 + target_data.ability[15] * 10 + target_data.ability[19] * 25
-    judge_mark -= min(target_data.ability[17] - target_data.ability[16], 0) * 50 + target_data.ability[18] * 100
+    judge_mark -= min(target_data.ability[17] - target_data.ability[16], 0) * 50 + target_data.ability[18] * 10
     judge += judge_mark
     if judge_mark:
         calculation_text += _("+全刻印总修正(") + str(judge_mark) + ")"
@@ -420,7 +420,7 @@ def calculation_instuct_judege(character_id: int, target_character_id: int, inst
     if judge_hardlove:
         calculation_text += _("+难以越过的底线(-") + str(judge_hardlove) + ")"
     # 被对方持有把柄修正
-    judge_weakness = target_data.talent[401] * 100
+    judge_weakness = target_data.talent[401] * 10
     judge -= judge_weakness
     if judge_weakness:
         calculation_text += _("+被对方持有把柄(-") + str(judge_weakness) + ")"
@@ -468,6 +468,17 @@ def calculation_instuct_judege(character_id: int, target_character_id: int, inst
         talent_name = game_config.config_talent[talent_id].name
         if judge_information:
             calculation_text += f"+{talent_name}({str(judge_information)})"
+
+    # 话术和战斗能力修正#
+    judge_talk = character_data.ability[40] * 25
+    judge += judge_talk
+    if judge_talk:
+        calculation_text += _("+话术能力(+") + str(judge_talk) + ")"
+    # 战斗能力修正#
+    judge_battle = character_data.ability[42] * 50
+    judge += judge_battle
+    if judge_battle:
+        calculation_text += _("+战斗能力(+") + str(judge_battle) + ")"
 
     # 访客不判定的部分
     if judge_data_type != "V":
