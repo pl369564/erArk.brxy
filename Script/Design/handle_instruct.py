@@ -334,15 +334,25 @@ def handle_item():
     """处理道具指令"""
     cache.now_panel_id = constant.Panel.ITEM
 
-
 @add_instruct(constant.Instruct.SAVE, constant.InstructType.SYSTEM, _("读写存档"),
               {constant_promise.Premise.NOT_H})
 def handle_save():
-    """处理读写存档指令"""
+    # """处理读写存档指令"""
     from Script.UI.Panel import see_save_info_panel
     now_panel = see_save_info_panel.SeeSaveListPanel(width, 1)
     now_panel.draw()
 
+@add_instruct(constant.Instruct.QSAVE, constant.InstructType.SYSTEM, _("快存"),
+              {constant_promise.Premise.NOT_H})
+def handle_qsave():
+    from Script.Core import save_handle
+    save_handle.establish_save("quick")
+
+@add_instruct(constant.Instruct.QLOAD, constant.InstructType.SYSTEM, _("快读"),
+              {constant_promise.Premise.NOT_H})
+def handle_qload():
+    from Script.Core import save_handle
+    save_handle.input_load_save("quick")
 
 @add_instruct(
     constant.Instruct.ABL_UP, constant.InstructType.SYSTEM, _("属性上升"),

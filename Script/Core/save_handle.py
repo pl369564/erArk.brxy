@@ -77,6 +77,15 @@ def establish_save_linux(save_id: str):
         "1": cache,
         "0": save_verson,
     }
+    #如果save_id=="quick",且save_path文件夹存在,则改名为backup
+    #如果backup文件夹存在,则删除
+    if save_id == "quick":
+        save_path = get_save_dir_path(save_id)
+        backup_path = save_path + "_backup"
+        if os.path.exists(backup_path):
+            shutil.rmtree(backup_path)
+        if os.path.exists(save_path):
+            shutil.move(save_path, backup_path)
     for key, value in data.items():
         write_save_data(save_id, key, value)
 

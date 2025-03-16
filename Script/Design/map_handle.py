@@ -633,6 +633,8 @@ def judge_scene_accessible(target_scene_str : str, character_id : int, draw_flag
                 info_draw.text = info_text
                 info_draw.width = width
                 info_draw.draw()
+            elif character_data.dormitory == target_scene_str:# 解决访客bug
+                cache.rhodes_island.facility_open[open_cid] = True
 
             return "wait_open"
 

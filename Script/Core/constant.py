@@ -2241,6 +2241,10 @@ class Instruct:
     """ 角色自定义特殊指令 """
     SAVE = 0
     """ 读写存档 """
+    QSAVE = 0
+    """ 读写存档 """
+    QLOAD = 0
+    """ 读写存档 """
     ABL_UP = 0
     """ 属性升级 """
     OWNER_ABL_UP = 0

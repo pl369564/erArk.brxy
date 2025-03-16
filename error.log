@@ -1,0 +1,171 @@
+
+版本信息：2025.3.10-1
+最近输入指令：['杜宾头像', '274', '杜宾头像', '可露希尔头像', '168', '168', '忍住', '杜宾头像', '273', '0', '33', '可露希尔头像', '274', '射出', '181', '确定', '169', '0', '101', '149', '5']
+当前游戏内时间：时间:2019年夏月11日3点16分
+Traceback (most recent call last):
+  File "E:\Py\erArk.brxy\Script\Core\game_init.py", line 59, in init
+    run_main_flow()
+  File "E:\Py\erArk.brxy\Script\Core\game_init.py", line 49, in run_main_flow
+    main_flow()
+  File "E:\Py\erArk.brxy\Script\Design\start_flow.py", line 16, in start_frame
+    constant.panel_data[cache.now_panel_id]()
+  File "E:\Py\erArk.brxy\Script\Design\handle_panel.py", line 18, in return_wrapper
+    return func(*args, **kwargs)
+  File "E:\Py\erArk.brxy\Script\UI\Flow\normal_flow.py", line 46, in in_scene_flow
+    now_panel.draw()
+  File "E:\Py\erArk.brxy\Script\UI\Panel\in_scene_panel.py", line 381, in draw
+    flow_handle.askfor_all(ask_list)
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 276, in askfor_all
+    _cmd_deal(order)
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 193, in _cmd_deal
+    cmd_map[order_number]()
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 120, in run_func
+    cmd_func(*arg, **kw)
+  File "E:\Py\erArk.brxy\Script\UI\Panel\in_scene_panel.py", line 654, in handle_instruct
+    handle_instruct.handle_instruct(instruct_id)
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 47, in handle_instruct
+    constant.handle_instruct_data[instruct]()
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 63, in return_wrapper
+    return func(*args, **kwargs)
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 342, in handle_save
+    save_handle.establish_save("quick")
+  File "E:\Py\erArk.brxy\Script\Core\save_handle.py", line 59, in establish_save
+    establish_save_linux(save_id)
+  File "E:\Py\erArk.brxy\Script\Core\save_handle.py", line 81, in establish_save_linux
+    write_save_data(save_id, key, value)
+  File "E:\Py\erArk.brxy\Script\Core\save_handle.py", line 110, in write_save_data
+    os.remove(save_path + "_backup")
+PermissionError: [WinError 5] �ܾ����ʡ�: 'save\\quick_backup'
+
+版本信息：2025.3.10-1
+最近输入指令：['阿米娅', '猥亵', '148', '0', '舍管房', '29', '29', '35', '杜宾', '148', '5', '9', '1', '0', '150', '0', '109', '150', '6', '收起图片栏', '6']
+当前游戏内时间：时间:2019年夏月11日1点46分
+Traceback (most recent call last):
+  File "E:\Py\erArk.brxy\Script\Core\game_init.py", line 59, in init
+    run_main_flow()
+  File "E:\Py\erArk.brxy\Script\Core\game_init.py", line 49, in run_main_flow
+    main_flow()
+  File "E:\Py\erArk.brxy\Script\Design\start_flow.py", line 16, in start_frame
+    constant.panel_data[cache.now_panel_id]()
+  File "E:\Py\erArk.brxy\Script\Design\handle_panel.py", line 18, in return_wrapper
+    return func(*args, **kwargs)
+  File "E:\Py\erArk.brxy\Script\UI\Flow\normal_flow.py", line 46, in in_scene_flow
+    now_panel.draw()
+  File "E:\Py\erArk.brxy\Script\UI\Panel\in_scene_panel.py", line 381, in draw
+    flow_handle.askfor_all(ask_list)
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 276, in askfor_all
+    _cmd_deal(order)
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 193, in _cmd_deal
+    cmd_map[order_number]()
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 120, in run_func
+    cmd_func(*arg, **kw)
+  File "E:\Py\erArk.brxy\Script\UI\Panel\in_scene_panel.py", line 654, in handle_instruct
+    handle_instruct.handle_instruct(instruct_id)
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 47, in handle_instruct
+    constant.handle_instruct_data[instruct]()
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 63, in return_wrapper
+    return func(*args, **kwargs)
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 349, in handle_qsave
+    save_handle.establish_save("quick")
+  File "E:\Py\erArk.brxy\Script\Core\save_handle.py", line 59, in establish_save
+    establish_save_linux(save_id)
+  File "E:\Py\erArk.brxy\Script\Core\save_handle.py", line 85, in establish_save_linux
+    os.remove(save_path + "_backup")
+PermissionError: [WinError 5] �ܾ����ʡ�: 'save\\quick_backup'
+
+版本信息：2025.3.10-1
+最近输入指令：['53', '102', '0', '影像厅', '35', '阿米娅', '猥亵', '148', '0', '舍管房', '29', '29', '35', '杜宾', '148', '5', '9', '1', '0', '收起图片栏', '6']
+当前游戏内时间：时间:2019年夏月11日1点24分
+Traceback (most recent call last):
+  File "c:\Users\yui12\AppData\Local\Programs\Python\Python39\lib\shutil.py", line 803, in move
+    os.rename(src, real_dst)
+OSError: [WinError 87] ��������: 'save\\quick' -> 'save\\quick\\backup'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\Py\erArk.brxy\Script\Core\game_init.py", line 59, in init
+    run_main_flow()
+  File "E:\Py\erArk.brxy\Script\Core\game_init.py", line 49, in run_main_flow
+    main_flow()
+  File "E:\Py\erArk.brxy\Script\Design\start_flow.py", line 16, in start_frame
+    constant.panel_data[cache.now_panel_id]()
+  File "E:\Py\erArk.brxy\Script\Design\handle_panel.py", line 18, in return_wrapper
+    return func(*args, **kwargs)
+  File "E:\Py\erArk.brxy\Script\UI\Flow\normal_flow.py", line 46, in in_scene_flow
+    now_panel.draw()
+  File "E:\Py\erArk.brxy\Script\UI\Panel\in_scene_panel.py", line 381, in draw
+    flow_handle.askfor_all(ask_list)
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 276, in askfor_all
+    _cmd_deal(order)
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 193, in _cmd_deal
+    cmd_map[order_number]()
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 120, in run_func
+    cmd_func(*arg, **kw)
+  File "E:\Py\erArk.brxy\Script\UI\Panel\in_scene_panel.py", line 654, in handle_instruct
+    handle_instruct.handle_instruct(instruct_id)
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 47, in handle_instruct
+    constant.handle_instruct_data[instruct]()
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 63, in return_wrapper
+    return func(*args, **kwargs)
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 349, in handle_qsave
+    save_handle.establish_save("quick")
+  File "E:\Py\erArk.brxy\Script\Core\save_handle.py", line 59, in establish_save
+    establish_save_linux(save_id)
+  File "E:\Py\erArk.brxy\Script\Core\save_handle.py", line 88, in establish_save_linux
+    shutil.move(save_path, backup_path)
+  File "c:\Users\yui12\AppData\Local\Programs\Python\Python39\lib\shutil.py", line 811, in move
+    raise Error("Cannot move a directory '%s' into itself"
+shutil.Error: Cannot move a directory 'save\quick' into itself 'save\quick\backup'.
+
+版本信息：2025.3.10-1
+最近输入指令：['11', '31', '6', '165', '0', '182', '181', '172', '3', '返回', '183', '1', '能力、经验与宝珠', '返回', '182', '183', '190', '11', '174', '返回', '199']
+当前游戏内时间：时间:2019年夏月13日22点11分
+Traceback (most recent call last):
+  File "E:\Py\erArk.brxy\Script\Core\game_init.py", line 59, in init
+    run_main_flow()
+  File "E:\Py\erArk.brxy\Script\Core\game_init.py", line 49, in run_main_flow
+    main_flow()
+  File "E:\Py\erArk.brxy\Script\Design\start_flow.py", line 16, in start_frame
+    constant.panel_data[cache.now_panel_id]()
+  File "E:\Py\erArk.brxy\Script\Design\handle_panel.py", line 18, in return_wrapper
+    return func(*args, **kwargs)
+  File "E:\Py\erArk.brxy\Script\UI\Flow\normal_flow.py", line 46, in in_scene_flow
+    now_panel.draw()
+  File "E:\Py\erArk.brxy\Script\UI\Panel\in_scene_panel.py", line 381, in draw
+    flow_handle.askfor_all(ask_list)
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 276, in askfor_all
+    _cmd_deal(order)
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 193, in _cmd_deal
+    cmd_map[order_number]()
+  File "E:\Py\erArk.brxy\Script\Core\flow_handle.py", line 120, in run_func
+    cmd_func(*arg, **kw)
+  File "E:\Py\erArk.brxy\Script\UI\Panel\in_scene_panel.py", line 654, in handle_instruct
+    handle_instruct.handle_instruct(instruct_id)
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 47, in handle_instruct
+    constant.handle_instruct_data[instruct]()
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 63, in return_wrapper
+    return func(*args, **kwargs)
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 3649, in handle_blowjob
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BLOWJOB, judge = _("�ڽ�"))
+  File "E:\Py\erArk.brxy\Script\Design\handle_instruct.py", line 172, in chara_handle_instruct_common_settle
+    update.game_update_flow(duration)
+  File "E:\Py\erArk.brxy\Script\Design\update.py", line 15, in game_update_flow
+    character_behavior.init_character_behavior()
+  File "E:\Py\erArk.brxy\Script\Design\character_behavior.py", line 57, in init_character_behavior
+    character_behavior(0, cache.game_time, pl_start_time)
+  File "E:\Py\erArk.brxy\Script\Design\character_behavior.py", line 131, in character_behavior
+    judge_character_status(character_id)
+  File "E:\Py\erArk.brxy\Script\Design\character_behavior.py", line 216, in judge_character_status
+    first_settle_panel = settle_behavior.handle_settle_behavior(character_id, end_time, event_type_now)
+  File "E:\Py\erArk.brxy\Script\Design\settle_behavior.py", line 69, in handle_settle_behavior
+    change_data = handle_instruct_data(character_id, behavior_id, now_time, add_time, change_data)
+  File "E:\Py\erArk.brxy\Script\Design\settle_behavior.py", line 304, in handle_instruct_data
+    talk.handle_talk(character_id)
+  File "E:\Py\erArk.brxy\Script\Design\talk.py", line 42, in handle_talk
+    now_talk_data = handle_talk_sub(character_id, behavior_id)
+  File "E:\Py\erArk.brxy\Script\Design\talk.py", line 123, in handle_talk_sub
+    now_weight = handle_premise.get_weight_from_premise_dict(premise_dict, character_id, weight_all_to_1_flag = True, unconscious_pass_flag = unconscious_pass_flag)
+  File "E:\Py\erArk.brxy\Script\Design\handle_premise.py", line 113, in get_weight_from_premise_dict
+    now_add_weight = constant.handle_premise_data[premise](character_id)
+KeyError: ''

@@ -3,4 +3,7 @@ cid,behavior_id,adv_id,premise,context
 str,int,int,str,str
 0,0,0,0,1
 口上配置数据,,,,
-0,332,0,high_1,{Name}触发了手指插入（V）指令的地文
+1,332,0,high_1,{Name}把手指插入了{TargetName}的阴道 {TargetName}发出一声娇喘，身体微微颤抖
+2,332,0,high_1,{Name}抚摸着{TargetName}的阴蒂，{TargetName}身体微微颤抖 却没有发出声音
+3,332,0,high_1,{Name}用手指在{TargetName}的阴道中抽插，{TargetName}发出一声娇喘，身体微微颤抖
+4,332,0,high_1,{Name}用手指在{TargetName}的阴道中抽插，{TargetName}忍耐着来自{Name}的刺激，没有发出声音

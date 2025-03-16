@@ -469,13 +469,13 @@ def calculation_instuct_judege(character_id: int, target_character_id: int, inst
         if judge_information:
             calculation_text += f"+{talent_name}({str(judge_information)})"
 
-    # 话术和战斗能力修正#
-    judge_talk = character_data.ability[40] * 25
+    # 话术能力修正#
+    judge_talk = character_data.ability[40] * 10
     judge += judge_talk
     if judge_talk:
         calculation_text += _("+话术能力(+") + str(judge_talk) + ")"
     # 战斗能力修正#
-    judge_battle = character_data.ability[42] * 50
+    judge_battle = character_data.ability[42] * 25
     judge += judge_battle
     if judge_battle:
         calculation_text += _("+战斗能力(+") + str(judge_battle) + ")"

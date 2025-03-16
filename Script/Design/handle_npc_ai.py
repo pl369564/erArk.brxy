@@ -792,13 +792,25 @@ def judge_weak_up_in_sleep_h(character_id: int):
         default.handle_both_h_state_reset(0, 1, game_type.CharacterStatusChange, datetime.datetime)
         # 同步玩家的行动开始时间
         character.init_character_behavior_start_time(character_id, cache.game_time)
+        # 刻印修正，快乐(13)、屈服(14)、苦痛(15)、时停(16)、恐怖(17)、反发(18)、无觉(19)修正
+        judge = target_data.ability[13]*2
+        judge += target_data.ability[14]*2
+        judge -= target_data.ability[18]*3
+        judge += target_data.ability[19]*2
+        #亲密|欲望|顺从|技
+        judge += target_data.ability[32]
+        judge += target_data.ability[33]
+        judge += target_data.ability[30]
+        judge += target_data.ability[31]
+
         # 检测是否满足高级性骚扰的实行值需求
-        if handle_premise.handle_instruct_judge_high_obscenity(now_character_data.target_character_id):
+        if judge>10|handle_premise.handle_instruct_judge_high_obscenity(now_character_data.target_character_id):
             # 如果已经陷落的话
             if handle_premise.handle_target_fall(character_id):
                 # 3级及以上的陷落时会直接变成H，对方变为装睡状态
                 character_fall_level = attr_calculation.get_character_fall_level(now_character_data.target_character_id, minus_flag=True)
-                if character_fall_level >= 3:
+
+                if character_fall_level >= 3|judge>10:
                     target_data.h_state.pretend_sleep = True
                     now_character_data.behavior.behavior_id = constant.Behavior.H
                     now_character_data.state = constant.CharacterStatus.STATUS_H
