@@ -810,7 +810,7 @@ def judge_weak_up_in_sleep_h(character_id: int):
                 # 3级及以上的陷落时会直接变成H，对方变为装睡状态
                 character_fall_level = attr_calculation.get_character_fall_level(now_character_data.target_character_id, minus_flag=True)
 
-                if character_fall_level >= 3|judge>10:
+                if character_fall_level >= 3 or judge>10:
                     target_data.h_state.pretend_sleep = True
                     now_character_data.behavior.behavior_id = constant.Behavior.H
                     now_character_data.state = constant.CharacterStatus.STATUS_H
