@@ -7,10 +7,9 @@ from Script.Core import (
     game_type,
     flow_handle,
     constant,
-    py_cmd
 )
 from Script.Config import game_config, normal_config
-from Script.Design import update, map_handle, character, game_time, cooking, handle_premise
+from Script.Design import update, map_handle, character, game_time, cooking
 
 panel_info_data = {}
 
@@ -25,51 +24,6 @@ line_feed.text = "\n"
 line_feed.width = 1
 window_width = normal_config.config_normal.text_width
 """ 屏幕宽度 """
-
-def common_select_npc_button_list_func(now_draw_panel: panel.PageHandlePanel, title_text: str = '', info_text:str = '') -> list:
-    """
-    通用npc选择按钮列表函数\n
-    Keyword arguments:\n
-    now_draw_panel -- 当前绘制面板，即CommonSelectNPCButtonList\n
-    now_draw_panel.text_list -- 最终按钮列表，每个子列表里\n：0号元素为角色id，1号元素为按钮要调用的函数source_func，2号元素为已选择角色id列表，默认值为空\n
-    title_text -- 标题文本\n
-    info_text -- 信息文本\n
-    return\n
-    return_list -- 返回按钮列表，包括返回按钮 "返回" \n
-    """
-
-    line_feed.draw()
-    # 绘制标题
-    if title_text:
-        title_draw = draw.TitleLineDraw(title_text, window_width)
-        title_draw.draw()
-    # 绘制分割线
-    else:
-        line_draw = draw.LineDraw("-", window_width)
-        line_draw.draw()
-    line_feed.draw()
-    # 绘制信息
-    if info_text:
-        info_draw = draw.NormalDraw()
-        info_draw.text = info_text
-        info_draw.width = window_width
-        info_draw.draw()
-        line_feed.draw()
-    return_list = []
-
-    # 绘制面板
-    now_draw_panel.update()
-    now_draw_panel.draw()
-    return_list.extend(now_draw_panel.return_list)
-
-    # 绘制返回按钮
-    line_feed.draw()
-    back_draw = draw.CenterButton(_("[返回]"), _("返回"), window_width)
-    back_draw.draw()
-    line_feed.draw()
-    return_list.append(back_draw.return_text)
-
-    return return_list
 
 class Close_Door_Panel:
     """
@@ -223,6 +177,105 @@ class Read_Book_Panel:
         character_data.behavior.book_name = book_data.name
         character_data.behavior.duration = 30
         update.game_update_flow(30)
+
+
+class Bondage_Panel:
+    """
+    用于绳子的面板对象
+    Keyword arguments:
+    width -- 绘制宽度
+    """
+
+    def __init__(self, width: int):
+        """初始化绘制对象"""
+        self.width: int = width
+        """ 绘制的最大宽度 """
+        self.draw_list: List[draw.NormalDraw] = []
+        """ 绘制的文本列表 """
+
+    def draw(self):
+        """绘制对象"""
+
+        character_data: game_type.Character = cache.character_data[0]
+
+        title_text = _("绳子")
+        title_draw = draw.TitleLineDraw(title_text, self.width)
+
+        while 1:
+            return_list = []
+            title_draw.draw()
+
+            # 交互对象的捆绑状态
+            target_character_id = character_data.target_character_id
+            target_character_data: game_type.Character = cache.character_data[target_character_id]
+            now_bondage_id = target_character_data.h_state.bondage
+            now_bondage_data = game_config.config_bondage[now_bondage_id]
+
+            # 输出提示信息
+            info_draw = draw.NormalDraw()
+            info_text = _("\n○捆绑下会持续获得欲情与苦痛，根据绑法的不同分为三级捆绑程度，程度越高的绑法获得的欲情与苦痛值越多\n")
+            info_text += _("  当前被捆绑的状态为：")
+            info_text += now_bondage_data.name
+            info_draw.text = info_text
+            info_draw.draw()
+            line_feed.draw()
+
+            # 四段捆绑等级
+            level_text_list = [_("无"), _("低"), _("中"), _("高")]
+            # 初始化捆绑计数
+            level_count = -1
+
+            # 遍历绳子捆绑数据
+            for bondage_id in game_config.config_bondage:
+                bondage_data = game_config.config_bondage[bondage_id]
+                bondage_id_text = str(bondage_id).rjust(2,'0')
+                bondage_lvel = bondage_data.level
+                bondage_text = f"[{bondage_id_text}]{bondage_data.name}"
+
+                # 用于在捆绑等级变化时更新文本
+                if bondage_lvel > level_count:
+                    level_count = bondage_lvel
+                    line_feed.draw()
+                    level_text = level_text_list[level_count]
+                    level_draw = draw.NormalDraw()
+                    level_draw.text = "  " + level_text + "："
+                    level_draw.draw()
+
+                button_draw = draw.LeftButton(
+                    _(bondage_text),
+                    _(str(bondage_id)),
+                    20,
+                    cmd_func=self.select_bondage,
+                    args=(bondage_id,),
+                    )
+                # print(f"debug button_draw.text = {button_draw.text},button_draw.normal_style = {button_draw.normal_style}")
+                return_list.append(button_draw.return_text)
+                button_draw.draw()
+
+            line_feed.draw()
+            line_feed.draw()
+            back_draw = draw.CenterButton(_("[返回]"), _("返回"), window_width)
+            back_draw.draw()
+            line_feed.draw()
+            return_list.append(back_draw.return_text)
+            yrn = flow_handle.askfor_all(return_list)
+            if yrn in return_list:
+                cache.now_panel_id = constant.Panel.IN_SCENE
+                break
+
+    def select_bondage(self, bondage_id):
+        """赋予选择的捆绑"""
+        from Script.Design import handle_instruct
+        character_data: game_type.Character = cache.character_data[0]
+        target_character_id = character_data.target_character_id
+        target_character_data: game_type.Character = cache.character_data[target_character_id]
+        target_character_data.h_state.bondage = bondage_id
+        # 如果捆绑id为0，则解除捆绑
+        if bondage_id == 0:
+            handle_instruct.chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_UNBIND, judge = _("SM"))
+        # 否则进行捆绑
+        else:
+            handle_instruct.chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BIND, judge = _("SM"))
 
 
 class Take_Care_Baby_Panel:
@@ -623,60 +676,3 @@ class Order_Hotel_Room_Panel:
         draw_text = _("\n成功预订了{0}，退房时间为{1}\n").format(room_name[room_id], pl_character_data.action_info.check_out_time)
         now_draw.text = draw_text
         now_draw.draw()
-
-class CommonSelectNPCButtonList:
-    """
-    通用的从列表中选择目标干员的面板
-    Keyword arguments:
-    chara_info -- 列表，0号元素为角色id，1号元素为按钮要调用的函数source_func，2号元素为已选择角色id列表，默认值为空
-    width -- 最大宽度
-    is_button -- 绘制按钮
-    num_button -- 绘制数字按钮
-    button_id -- 数字按钮id
-    """
-
-    def __init__(
-        self, chara_info: list, width: int, is_button: bool, num_button: bool, button_id: int
-    ):
-        """初始化绘制对象"""
-
-        self.chara_id: int = chara_info[0]
-        """ 角色id """
-        self.source_func = chara_info[1]
-        """ 按钮调用的函数 """
-        self.chara_id_list: List[int] = chara_info[2] if len(chara_info) > 2 else []
-        """ 已选择角色id列表 """
-        self.draw_text: str = ""
-        """ 绘制文本 """
-        self.width: int = width
-        """ 最大宽度 """
-        self.num_button: bool = num_button
-        """ 绘制数字按钮 """
-        self.button_id: int = button_id
-        """ 数字按钮的id """
-        self.button_return: str = str(button_id)
-        """ 按钮返回值 """
-
-        character_data: game_type.Character = cache.character_data[self.chara_id]
-        button_text = f"[{str(character_data.adv).rjust(4,'0')}]：{character_data.name}"
-
-        draw_style = 'standard'
-        # 如果当前角色已经被选择，则更改按钮样式
-        if self.chara_id in self.chara_id_list:
-            draw_style = 'gold_enrod'
-        # 如果未选中且是有口上颜色的角色，则显示口上颜色
-        elif character_data.text_color:
-            draw_style = character_data.name
-
-        # 按钮绘制
-        name_draw = draw.LeftButton(
-            button_text, character_data.name, self.width, normal_style=draw_style, cmd_func=self.source_func, args=(self.chara_id,)
-        )
-        self.button_return = name_draw.return_text
-        """ 绘制的对象 """
-        self.now_draw = name_draw
-        self.draw_text = button_text
-
-    def draw(self):
-        """绘制对象"""
-        self.now_draw.draw()

@@ -1,16 +1,14 @@
 from typing import List
 from types import FunctionType
-from Script.Core import cache_control, game_type, get_text, flow_handle, constant
+from Script.Core import cache_control, game_type, get_text, flow_handle
 from Script.UI.Moudle import draw, panel
 from Script.Config import game_config, normal_config
-from Script.Design import attr_text, attr_calculation, game_time
 import openai
 import google.generativeai as genai
 import concurrent.futures
 import os
 import csv
 import httpx
-import re
 
 cache: game_type.Cache = cache_control.cache
 """ 游戏缓存数据 """
@@ -22,412 +20,6 @@ line_feed.text = "\n"
 line_feed.width = 1
 window_width: int = normal_config.config_normal.text_width
 """ 窗体宽度 """
-
-
-def judge_use_text_ai(character_id: int, behavior_id: int, original_text: str, translator: bool = False) -> str:
-    """
-    判断是否使用文本生成AI\n
-    Keyword arguments:\n
-    character_id -- 角色id\n
-    behavior_id -- 行为id\n
-    original_text -- 原始文本\n
-    translator -- 翻译模式\n
-    Return arguments:
-    fanal_text -- 最终文本
-    """
-    # 如果AI设置未开启，则直接返回原文本
-    if 1 not in cache.ai_setting.ai_chat_setting or cache.ai_setting.ai_chat_setting[1] == 0:
-        return original_text
-    # 如果api密钥未设置，则直接返回原文本
-
-    # 判断在调用哪个api
-    model = cache.ai_setting.ai_chat_setting[5]
-    # 如果没有输入模型名，则返回原文本
-    if not model:
-        return original_text
-    if 'gpt' in model:
-        now_key_type = 'OPENAI_API_KEY'
-    elif 'gemini' in model:
-        now_key_type = 'GEMINI_API_KEY'
-    elif 'deepseek' in model:
-        now_key_type = 'DEEPSEEK_API_KEY'
-    else:
-        now_key_type = 'OPENAI_API_KEY'
-    if now_key_type not in cache.ai_setting.ai_chat_api_key:
-        return original_text
-    # 判断是否设置了指令类型
-    if cache.ai_setting.ai_chat_setting[2] == 0:
-        safe_flag = False
-        status_data = game_config.config_status[behavior_id]
-        # 判断是否是安全标签
-        for safe_tag in ["日常", "娱乐", "工作"]:
-            if safe_tag in status_data.tag:
-                safe_flag = True
-                break
-        if not safe_flag:
-            return original_text
-
-    # 判断是什么类型的地文
-    if cache.ai_setting.ai_chat_setting[3] == 0 and not translator:
-        if "地文" not in original_text:
-            return original_text
-
-    # 输出文本生成提示
-    if cache.ai_setting.ai_chat_setting[8] == 0:
-        model = cache.ai_setting.ai_chat_setting[5]
-        info_draw = draw.NormalDraw()
-        info_text = _("\n（正在调用{0}）\n").format(model)
-        info_draw.text = info_text
-        info_draw.width = window_width
-        info_draw.draw()
-
-    ai_gererate_text = text_ai(character_id, behavior_id, original_text, translator=translator)
-    # 检测是否显示原文本
-    if cache.ai_setting.ai_chat_setting[4] == 1:
-        fanal_text = ai_gererate_text
-    else:
-        fanal_text = "(原文本)" + original_text + "\n" + ai_gererate_text
-
-    # 是否保存
-    if cache.ai_setting.ai_chat_setting[7] == 1 and not translator:
-        save_path = "data/talk/ai/ai_talk.csv"
-        # 检测是否存在文件，如果不存在的话，创建文件
-        # 检查文件是否存在
-        if not os.path.exists(save_path):
-            # 如果文件不存在，创建文件夹和文件
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            with open(save_path, 'w', encoding='utf-8') as f:
-                f.write("cid,behavior_id,adv_id,premise,context\n")
-                f.write("口上id,触发口上的行为id,口上限定的剧情npcid,前提id,口上内容\n")
-                f.write("str,int,int,str,str\n")
-                f.write("0,0,0,0,1\n")
-                f.write("口上配置数据,,,,\n")
-
-        # 读取save_path文件的最后一行，获取其cid，然后加1
-        with open(save_path, "r", encoding='utf-8') as f:
-            lines = f.readlines()
-            last_line = lines[-1]
-            last_cid = last_line.split(",")[0]
-            if last_cid == "口上配置数据":
-                new_cid = 0
-            else:
-                new_cid = int(last_cid) + 1
-
-        # 将角色名称还原回代码
-        character_data = cache.character_data[character_id]
-        target_character_data = cache.character_data[character_data.target_character_id]
-        Name = character_data.name
-        TargetNickName = target_character_data.name
-        # 查找是否存在该角色名称，如果存在的话，将其还原回代码
-        if Name in ai_gererate_text:
-            ai_gererate_text = ai_gererate_text.replace(Name, '{Name}')
-        if character_id != 0 or character_data.target_character_id != 0:
-            if TargetNickName in ai_gererate_text:
-                ai_gererate_text = ai_gererate_text.replace(TargetNickName, '{TargetName}')
-
-        # 前提文本
-        premise_text = "generate_by_ai"
-        # 触发者
-        if character_id == 0:
-            premise_text += "&sys_0"
-        else:
-            premise_text += "&sys_1"
-        # 交互对象
-        if character_data.target_character_id == 0:
-            premise_text += "&sys_4"
-        else:
-            premise_text += "&sys_5"
-
-        # 保存数据
-        with open(save_path, "a", encoding='utf-8') as f:
-            f.write(f"{new_cid},{behavior_id},0,{premise_text},{ai_gererate_text}\n")
-
-    return fanal_text
-
-def text_ai(character_id: int, behavior_id: int, original_text: str, translator: bool = False) -> str:
-    """
-    文本生成AI\n\n
-    Keyword arguments:
-    character_id: int 角色id\n
-    behavior_id: int 行为id\n
-    original_text: str 原始文本\n
-    translator -- 翻译模式\n
-    """
-    from Script.Design import handle_premise
-
-    # 基础数据
-    character_data = cache.character_data[character_id]
-    target_character_data = cache.character_data[character_data.target_character_id]
-    Name = character_data.name
-    TargetNickName = target_character_data.name
-    Location = character_data.position[-1]
-    Season = game_time.get_month_text()
-    time = game_time.get_day_and_time_text()
-    talk_num = cache.ai_setting.ai_chat_setting[9] + 1
-    Behavior_Name = game_config.config_status[behavior_id].name
-
-    # 模型与密钥
-    model = cache.ai_setting.ai_chat_setting[5]
-    if 'gpt' in model:
-        now_key_type = 'OPENAI_API_KEY'
-    elif 'gemini' in model:
-        now_key_type = 'GEMINI_API_KEY'
-    elif 'deepseek' in model:
-        now_key_type = 'DEEPSEEK_API_KEY'
-    else:
-        now_key_type = 'OPENAI_API_KEY'
-    API_KEY = cache.ai_setting.ai_chat_api_key[now_key_type]
-
-    # 系统提示词
-    system_promote = ''
-    for system_promote_cid in game_config.ui_text_data['text_ai_system_promote']:
-        system_promote_text = game_config.ui_text_data['text_ai_system_promote'][system_promote_cid]
-        # 对生成数量的替换处理
-        if "{talk_num}" in system_promote_text:
-            system_promote_text = system_promote_text.replace("{talk_num}", str(talk_num))
-        system_promote += _(system_promote_text)
-    # print(system_promote)
-    # 生成模式
-    if not translator:
-        user_prompt = _('请根据以下条件，描写两个角色的互动场景：')
-        # 有交互对象时
-        if character_id != 0 or character_data.target_character_id != 0:
-            if character_id == 0:
-                pl_name = Name
-                npc_name = TargetNickName
-                npc_character_id = character_data.target_character_id
-                npc_character_data = target_character_data
-            elif character_data.target_character_id == 0:
-                pl_name = TargetNickName
-                npc_name = Name
-                npc_character_id = character_id
-                npc_character_data = character_data
-            else:
-                return original_text
-            # 名字
-            user_prompt += _("在当前的场景里，{0}是医药公司的领导人，被称为博士，{1}是一家医药公司的员工。").format(pl_name, npc_name)
-            # 动作
-            user_prompt += _("{0}正在对{1}进行的动作是{2}。你要弄清楚是谁对谁做了什么，{0}是做这个动作的人，{1}是被做了这个动作的人。").format(Name, TargetNickName, Behavior_Name)
-            user_prompt += _("你需要仅描述这个动作，包括角色的肢体动作、角色的台词、角色的心理活动、角色与场景中的物体的交互等。你不要描述动作之前的剧情，或者动作之后的剧情，只描述这个动作的过程。")
-            user_prompt += _("以下是一些额外提供的参考信息，信息里包括了两个人的详细信息，你可以这些信息中挑选一部分来丰富对本次动作的描述，你只能直接使用这些信息本身，不能从这些信息中联想或者猜测其他的信息：")
-            # 地点
-            user_prompt += _("场景发生的地点是{0}。").format(Location)
-            # 时间
-            user_prompt += _("当前的季节是{0}，当前的时间是{1}。").format(Season, time)
-            # 关系
-            favorability = npc_character_data.favorability[0]
-            favorability_lv, tem = attr_calculation.get_favorability_level(favorability)
-            trust = npc_character_data.trust
-            trust_lv, tem = attr_calculation.get_trust_level(trust)
-            ave_lv = int((favorability_lv + trust_lv) / 2)
-            user_prompt += _("如果用数字等级来表示关系好坏，0是第一次见面的陌生人，8是托付人生的亲密伴侣，那{0}和{1}的关系大概是{2}。").format(Name, TargetNickName, ave_lv)
-            # 陷落
-            fall_lv = attr_calculation.get_character_fall_level(npc_character_id, minus_flag = True)
-            if fall_lv > 0:
-                user_prompt += _("{0}和{1}是正常的爱情关系。如果用数字等级来表示爱情的程度，1是有些懵懂的好感，4是至死不渝的爱人，那{0}和{1}的关系大概是{4}。").format(Name, TargetNickName, Name, TargetNickName, fall_lv)
-            elif fall_lv < 0:
-                user_prompt += _("{0}和{1}是扭曲的服从和支配的关系。如果用数字等级来表示服从的程度，1是有些讨好和有些卑微，4是无比的尊敬和彻底的服从，那{2}对{3}的服从的等级大概是{4}。").format(Name, TargetNickName, npc_name, pl_name, fall_lv)
-
-            # 基础状态
-            # 年龄素质
-            age_text = attr_text.get_age_talent_text(npc_character_id)
-            user_prompt += _("{0}的年龄是{1}。").format(npc_name, age_text)
-            # 睡眠、疲劳、困倦
-            if handle_premise.handle_action_sleep(npc_character_id) or handle_premise.handle_unconscious_flag_1(npc_character_id):
-                tem,sleep_name = attr_calculation.get_sleep_level(npc_character_data.sleep_point)
-                user_prompt += _("{0}正在睡觉，睡眠的深度是{1}。").format(npc_name, sleep_name)
-            else:
-                # 疲劳与困倦
-                sleep_lv = attr_calculation.get_tired_level(npc_character_data.tired_point)
-                if sleep_lv > 0:
-                    sleep_text = constant.sleep_text_list[sleep_lv]
-                    user_prompt += _("{0}有些困了，困的程度为{1}。").format(npc_name, sleep_text)
-            # 心情
-            angry_text = attr_calculation.get_angry_text(npc_character_data.angry_point)
-            if angry_text != "普通":
-                user_prompt += _("{0}的心情状态是{1}。").format(npc_name, angry_text)
-            # 跟随
-            if handle_premise.handle_is_follow_1(npc_character_id):
-                user_prompt += _("{0}正在跟随{1}一起行动。").format(npc_name, pl_name)
-            # 尿意
-            if handle_premise.handle_urinate_ge_80(npc_character_id):
-                user_prompt += _("{0}有点想上厕所尿尿。").format(npc_name)
-            # 饥饿
-            if handle_premise.handle_hunger_ge_80(npc_character_id):
-                user_prompt += _("{0}有点饿了，想吃东西。").format(npc_name)
-            # 催眠
-            if handle_premise.handle_unconscious_hypnosis_flag(npc_character_id):
-                user_prompt += _("{0}被{1}催眠了。").format(npc_name, pl_name)
-            # 监禁
-            if handle_premise.handle_imprisonment_1(npc_character_id):
-                user_prompt += _("{0}被{1}监禁在监狱里了。").format(npc_name, pl_name)
-            # 访客
-            if npc_character_data.sp_flag.vistor == 1:
-                user_prompt += _("{0}不是公司的员工，是前来拜访的访客。").format(npc_name)
-            # 时停
-            if handle_premise.handle_unconscious_flag_3(npc_character_id):
-                user_prompt += _("{0}正处在停止的时间中，无法做出任何反应。").format(npc_name)
-            # 中量数据才有的分支
-            if cache.ai_setting.ai_chat_setting[6] >= 1:
-                # 职业
-                profession_name = game_config.config_profession[npc_character_data.profession].name
-                user_prompt += _("{0}的职业是{1}。").format(npc_name, profession_name)
-                # 种族
-                race_name = game_config.config_race[npc_character_data.race].name
-                user_prompt += _("{0}是一种虚构的奇幻种族，种族名是{1}。").format(npc_name, race_name)
-                # 出身地
-                birthplace_name = game_config.config_birthplace[npc_character_data.relationship.birthplace].name
-                user_prompt += _("{0}的出生地是{1}。").format(npc_name, birthplace_name)
-                # 势力
-                nation_name = game_config.config_nation[npc_character_data.relationship.nation].name
-                user_prompt += _("{0}所属的具体势力是{1}。").format(npc_name, nation_name)
-                # 全素质数据
-                user_prompt += _("{0}有以下素质特性：").format(npc_name)
-                for talent_id in game_config.config_talent:
-                    if npc_character_data.talent[talent_id]:
-                        talent_name = game_config.config_talent[talent_id].name
-                        user_prompt += _("{0}、").format(talent_name)
-                user_prompt = user_prompt[:-1] + "。"
-            # 大量数据才有的分支
-            if cache.ai_setting.ai_chat_setting[6] >= 2:
-                # 服装
-                user_prompt += _("{0}穿着的衣服有：").format(npc_name)
-                for clothing_type in game_config.config_clothing_type:
-                    if len(npc_character_data.cloth.cloth_wear[clothing_type]):
-                        for cloth_id in npc_character_data.cloth.cloth_wear[clothing_type]:
-                            cloth_name = game_config.config_clothing_tem[cloth_id].name
-                            user_prompt += _("{0}、").format(cloth_name)
-                user_prompt = user_prompt[:-1] + "。"
-                # 工作
-                if handle_premise.handle_have_work(npc_character_id):
-                    work_name = game_config.config_work_type[npc_character_data.work.work_type].name
-                    user_prompt += _("{0}的工作是{1}。").format(npc_name, work_name)
-                # 称呼
-                if handle_premise.handle_self_have_nick_name_to_pl(npc_character_id):
-                    nick_name = npc_character_data.nick_name_to_pl
-                    user_prompt += _("{0}称呼{1}为{2}。").format(npc_name, pl_name, nick_name)
-                if handle_premise.handle_self_have_nick_name_to_self(npc_character_id):
-                    nick_name = npc_character_data.nick_name
-                    user_prompt += _("{0}称呼{1}为{2}。").format(pl_name, npc_name, nick_name)
-
-        else:
-            user_prompt += _("在当前的场景里，{0}是医药公司的领导人之一，被称为博士。").format(Name)
-            user_prompt += _("{0}正在进行的动作是{1}。").format(Name, Behavior_Name)
-            # 地点
-            user_prompt += _("场景发生的地点是{0}。").format(Location)
-            # 时间
-            user_prompt += _("当前的季节是{0}，当前的时间是{1}。").format(Season, time)
-    # 翻译模式
-    else:
-        user_prompt = _('你需要将一段文本翻译为')
-        user_prompt += normal_config.config_normal.language
-        user_prompt += _('语言。如果文本中有有\{\}括起来的字符，请原样保留。请原样保留文本中的换行符。以下是需要翻译的文本：')
-        user_prompt += original_text
-    # print(f'user_prompt = {user_prompt}')
-    # 开始调用AI
-
-    # 调用OpenAI
-    if now_key_type == "OPENAI_API_KEY" or now_key_type == "DEEPSEEK_API_KEY":
-        # 创建client
-        client = openai.OpenAI(api_key=API_KEY)
-        # deepseek则调整base_url
-        if now_key_type == "DEEPSEEK_API_KEY":
-            client = client.with_options(base_url="https://api.deepseek.com")
-        # 自定义base_url
-        if cache.ai_setting.ai_chat_setting[10] == 1:
-            client = client.with_options(base_url=cache.ai_setting.now_ai_chat_base_url)
-        # 自定义代理
-        if cache.ai_setting.ai_chat_setting[11] == 1:
-            if len(cache.ai_setting.now_ai_chat_proxy[1]) == 0:
-                client = client.with_options(http_client=openai.DefaultHttpxClient(proxies=cache.ai_setting.now_ai_chat_proxy[0]))
-            else:
-                client = client.with_options(http_client=openai.DefaultHttpxClient(proxies=cache.ai_setting.now_ai_chat_proxy[0], transport=httpx.HTTPTransport(local_address=cache.ai_setting.now_ai_chat_proxy[1])))
-        try:
-            # 发送请求
-            # 流式输出
-            if cache.ai_setting.ai_chat_setting[14] == 1:
-                completion = client.chat.completions.create(
-                    model=cache.ai_setting.ai_chat_setting[5],
-                    messages=[
-                        {"role": "system", "content": system_promote},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    stream=True
-                )
-                # 获取返回的文本
-                ai_gererate_text = ""
-                # 进行绘制
-                now_draw = draw.NormalDraw()
-                for chunk in completion:
-                    chunk_text = chunk.choices[0].delta.content
-                    # print(chunk_text, end="", flush=True)
-                    now_draw.text = chunk_text
-                    now_draw.width = 1
-                    now_draw.draw()
-                    ai_gererate_text += chunk_text
-            # 非流式输出
-            else:
-                completion = client.chat.completions.create(
-                    model=cache.ai_setting.ai_chat_setting[5],
-                    messages=[
-                        {"role": "system", "content": system_promote},
-                        {"role": "user", "content": user_prompt}
-                    ]
-                )
-                # 获取返回的文本
-                ai_gererate_text = completion.choices[0].message.content
-        except Exception as e:
-            # 如果发生异常，将返回的文本设为空
-            ai_gererate_text = ""
-    # 调用Gemini
-    elif now_key_type == "GEMINI_API_KEY":
-        # 创建client
-        genai.configure(api_key=API_KEY)
-        # gemini的传输协议改为rest
-        if cache.ai_setting.ai_chat_setting[12] == 1:
-            genai.configure(api_key=API_KEY, transport='rest')
-        client = genai.GenerativeModel(model, system_instruction = system_promote)
-        try:
-            # 发送请求
-            # 流式输出
-            if cache.ai_setting.ai_chat_setting[14] == 1:
-                completion = client.generate_content(user_prompt, stream=True)
-                # 获取返回的文本
-                ai_gererate_text = ""
-                # 进行绘制
-                now_draw = draw.NormalDraw()
-                for chunk in completion:
-                    chunk_text = chunk.text
-                    # print(chunk_text, end="", flush=True)
-                    now_draw.text = chunk_text
-                    now_draw.width = 1
-                    now_draw.draw()
-                    ai_gererate_text += chunk_text
-            # 非流式输出
-            else:
-                completion = client.generate_content(user_prompt)
-                # 获取返回的文本
-                ai_gererate_text = completion.text
-        except Exception as e:
-            # 如果发生异常，将返回的文本设为空
-            ai_gererate_text = ""
-
-    # 如果没有返回文本，则返回原文本
-    if ai_gererate_text == None or not len(ai_gererate_text):
-        ai_gererate_text = _("(生成失败，使用原文本)") + original_text
-
-    # 在不影响\\n的情况下，将\n删去
-    ai_gererate_text = ai_gererate_text.replace("\n", "")
-    # 非翻译模式下删去空格
-    if not translator:
-        ai_gererate_text = ai_gererate_text.replace(" ", "")
-    # 删除思考过程
-    if cache.ai_setting.ai_chat_setting[13] == 1:
-        # 使用正则删除<think>到</think>之间的内容
-        ai_gererate_text = re.sub(r'<think>.*?</think>', '', ai_gererate_text)
-    # print(ai_gererate_text)
-
-    return ai_gererate_text
 
 
 class Chat_Ai_Setting_Panel:
@@ -482,7 +74,6 @@ class Chat_Ai_Setting_Panel:
 
                 yrn = flow_handle.askfor_all(return_list)
                 if yrn == no_draw.return_text:
-                    cache.now_panel_id = constant.Panel.IN_SCENE
                     return
                 elif yrn == yes_draw.return_text:
                     break
@@ -519,6 +110,9 @@ class Chat_Ai_Setting_Panel:
                 # 如果没有该键，则创建一个，并置为0
                 if cid not in cache.ai_setting.ai_chat_setting:
                     cache.ai_setting.ai_chat_setting[cid] = 0
+                    # 将部分选项默认设为1
+                    if cid in {7, 12, 14}:
+                        cache.ai_setting.ai_chat_setting[cid] = 1
                 now_setting_flag = cache.ai_setting.ai_chat_setting[cid] # 当前设置的值
                 option_len = len(game_config.config_ai_chat_setting_option[cid]) # 选项的长度
 
@@ -526,8 +120,13 @@ class Chat_Ai_Setting_Panel:
                 # 自定义模型的名字
                 if cid == 5:
                     button_text = f" [{cache.ai_setting.ai_chat_setting[cid]}] "
+                # 自定义发送的数据
+                elif cid == 6:
+                    button_text = _(" [调整发送的数据] ")
+                # 自定义base_url
                 elif cid == 10 and cache.ai_setting.ai_chat_setting[cid] == 1:
                     button_text = f" [{game_config.config_ai_chat_setting_option[cid][now_setting_flag]}] " + cache.ai_setting.now_ai_chat_base_url
+                # 自定义代理
                 elif cid == 11 and cache.ai_setting.ai_chat_setting[cid] == 1:
                     button_text = f" [{game_config.config_ai_chat_setting_option[cid][now_setting_flag]}] " + "ip：" + cache.ai_setting.now_ai_chat_proxy[0]
                     if len(cache.ai_setting.now_ai_chat_proxy[1]) > 0:
@@ -655,7 +254,6 @@ class Chat_Ai_Setting_Panel:
             return_list.append(back_draw.return_text)
             yrn = flow_handle.askfor_all(return_list)
             if yrn == back_draw.return_text:
-                cache.now_panel_id = constant.Panel.IN_SCENE
                 break
 
     def draw_info(self, cid):
@@ -695,6 +293,9 @@ class Chat_Ai_Setting_Panel:
             new_model = ask_panel.draw()
             cache.ai_setting.ai_chat_setting[cid] = new_model
             self.test_flag = 0 # 重置测试标志
+        # 自定义发送的数据
+        elif cid == 6:
+            self.select_send_data()
         # 调整生成文本数量的选项单独处理
         elif cid == 9:
             line_feed.draw()
@@ -769,6 +370,117 @@ class Chat_Ai_Setting_Panel:
                 cache.ai_setting.ai_chat_setting[cid] += 1
             else:
                 cache.ai_setting.ai_chat_setting[cid] = 0
+
+    def select_send_data(self):
+        """选择发送的数据"""
+        while True:
+            send_data_all_flags = cache.ai_setting.send_data_flags
+            return_list = []
+            title_draw = draw.TitleLineDraw(_("选择发送给AI的数据"), self.width)
+            title_draw.draw()
+            
+            # 显示提示信息
+            info_draw = draw.NormalDraw()
+            info_text = _(" \n ○发送的数据越多，AI可以利用的信息就越多，理论效果会越好\n")
+            info_text += _("  但同时消耗的tokens和响应时间也越多，也可能因为信息太多而抓不住重点或超出上下文长度\n")
+            info_text += _("  每项的数据量有小、中、大三级区分\n")
+            info_text += _("  发送数据的文件路径为：data\csv\Ai_Chat_Send_Data.csv，可根据需要自行修改提示词\n")
+            info_draw.text = info_text
+            info_draw.width = self.width
+            info_draw.draw()
+            
+            # 遍历所有数据
+            for send_data_cid in game_config.config_ai_chat_send_data:
+                ai_chat_send_data = game_config.config_ai_chat_send_data[send_data_cid]
+                
+                # 跳过ID为0的表头
+                if send_data_cid == 0:
+                    continue
+                    
+                # 初始化不存在的数据选择状态
+                if send_data_cid not in send_data_all_flags:
+                    # 如果是默认选择的，设为True，否则设为False
+                    if ai_chat_send_data.default == 1:
+                        send_data_all_flags[send_data_cid] = True
+                    else:
+                        send_data_all_flags[send_data_cid] = False
+
+                # 如果当前cid的余数是1，则换行
+                if send_data_cid % 10 == 1:
+                    line_feed.draw()
+
+                # 获取数据信息
+                send_data_name = ai_chat_send_data.name
+                send_data_required = ai_chat_send_data.required
+                send_data_size = ai_chat_send_data.data_size
+                
+                # 数据量显示
+                if send_data_size == 1:
+                    size_text = _("小")
+                elif send_data_size == 2:
+                    size_text = _("中")
+                elif send_data_size == 3:
+                    size_text = _("大")
+                else:
+                    size_text = _("未知")
+                    
+                # 构建显示文本
+                line_text = f"  {send_data_name}({size_text})  "
+                button_len = max(len(line_text) * 2, 40)
+                
+                # 绘制数据名称和数据量，点击后将打印该send_data的提示信息
+                name_draw = draw.LeftButton(line_text, send_data_name + '_prompt', button_len, cmd_func=self.print_send_data_prompt, args=(send_data_cid,))
+                name_draw.draw()
+                return_list.append(name_draw.return_text)
+                
+                # 绘制选择按钮（必选数据没有按钮）
+                if send_data_required == 1:
+                    button_text = _("【必选】")
+                    required_draw = draw.LeftDraw()
+                    required_draw.text = button_text
+                    required_draw.draw()
+                else:
+                    if send_data_all_flags[send_data_cid]:
+                        button_text = _("[√]")
+                    else:
+                        button_text = _("[×]")
+                    button_draw = draw.CenterButton(button_text, send_data_name, 10, cmd_func=self.toggle_send_data, args=(send_data_cid))
+                    button_draw.draw()
+                    return_list.append(button_draw.return_text)
+
+                line_feed.draw()
+            
+            # 添加返回按钮
+            line_feed.draw()
+            save_draw = draw.CenterButton(_("[返回]"), _("返回"), window_width // 2)
+            save_draw.draw()
+            return_list.append(save_draw.return_text)
+            
+            line_feed.draw()
+            
+            # 等待用户选择
+            yrn = flow_handle.askfor_all(return_list)
+            
+            # 处理用户选择
+            if yrn == save_draw.return_text:
+                break
+
+    def print_send_data_prompt(self, send_data_cid):
+        """打印数据的提示信息"""
+        line_draw = draw.LineDraw("-", self.width)
+        line_draw.draw()
+        line_feed.draw()
+        ai_chat_send_data = game_config.config_ai_chat_send_data[send_data_cid]
+        now_draw = draw.WaitDraw()
+        now_draw.text = ai_chat_send_data.prompt
+        now_draw.width = self.width
+        now_draw.draw()
+        line_feed.draw()
+        line_feed.draw()
+
+    def toggle_send_data(self, send_data_cid):
+        """切换数据是否被选择"""
+        cache.ai_setting.send_data_flags[send_data_cid] = not cache.ai_setting.send_data_flags[send_data_cid]
 
     def change_translator(self):
         """修改翻译设置"""
@@ -917,6 +629,9 @@ class Chat_Ai_Setting_Panel:
                 genai.configure(api_key=API_KEY, transport='rest')
             client = genai.GenerativeModel(model)
 
+        info_draw = draw.NormalDraw()
+        info_draw.width = self.width
+
         # 测试AI，在10秒内如果没有返回结果，则认为测试不通过
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(self.get_completion, client, now_key_type)
@@ -933,13 +648,18 @@ class Chat_Ai_Setting_Panel:
                 info_text = _(" \n  测试不通过，原因：{0}\n").format(e)
                 self.test_flag = 2
                 self.error_message = str(e)
-        info_draw = draw.NormalDraw()
-        info_draw.text = info_text
-        info_draw.width = self.width
-        info_draw.draw()
+            finally:
+                info_draw.text = info_text
+                info_draw.draw()
+                # TODO 不知道为什么取消没有生效，十分奇怪
+                # 取消任务
+                future.cancel()
+                # 关闭线程池
+                executor.shutdown(wait=False, cancel_futures=True)
+                return
 
     def get_completion(self, client, key_type):
-
+        """获取AI的返回结果"""
         if key_type == "OPENAI_API_KEY":
             return client.chat.completions.create(
                 model=cache.ai_setting.ai_chat_setting[5],

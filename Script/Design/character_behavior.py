@@ -19,6 +19,7 @@ from Script.Design import (
     handle_premise_place,
     event,
     handle_npc_ai,
+    handle_npc_ai_in_h,
     map_handle,
     attr_calculation,
     pregnancy,
@@ -104,7 +105,7 @@ def character_behavior(character_id: int, now_time: datetime.datetime, pl_start_
         handle_npc_ai.judge_character_tired_sleep(character_id) # 判断疲劳和睡眠
         handle_npc_ai.judge_character_cant_move(character_id) # 无法自由移动的角色
         handle_npc_ai.judge_character_follow(character_id) # 跟随模式
-        handle_npc_ai.judge_character_h_obscenity_unconscious(character_id) # H状态、猥亵与无意识
+        handle_npc_ai_in_h.judge_character_h_obscenity_unconscious(character_id, pl_start_time) # H状态、猥亵与无意识
 
     # 处理公共资源
     # update_cafeteria() # 刷新食堂的饭，不需要了，改为NPC在没有饭的时候自动刷新
@@ -141,7 +142,7 @@ def character_behavior(character_id: int, now_time: datetime.datetime, pl_start_
                 cache.over_behavior_character.add(character_id)
         #         print(f"debug time_judge")
         handle_npc_ai.judge_character_tired_sleep(character_id) # 结算疲劳
-        handle_npc_ai.judge_character_h_obscenity_unconscious(character_id) # H状态、猥亵与无意识
+        handle_npc_ai_in_h.judge_character_h_obscenity_unconscious(character_id, pl_start_time) # H状态、猥亵与无意识
         judge_pl_real_time_data() # 玩家实时数据结算
         # print(f"debug 玩家结算完毕")
 
@@ -455,10 +456,9 @@ def judge_before_pl_behavior():
         if target_character_data.h_state.shoot_position_cloth != -1:
             target_character_data.h_state.shoot_position_cloth = -1
 
-    else:
-        # 睡眠时间在6h及以上的额外恢复
-        if pl_character_data.state == constant.CharacterStatus.STATUS_SLEEP and pl_character_data.behavior.duration >= 360:
-            refresh_temp_semen_max() # 刷新玩家临时精液上限
+    # 睡眠时间在6h及以上的额外恢复
+    if pl_character_data.state == constant.CharacterStatus.STATUS_SLEEP and pl_character_data.behavior.duration >= 360:
+        refresh_temp_semen_max() # 刷新玩家临时精液上限
 
     # 结算上次进行聊天的时间，以重置聊天计数器#
     settle_behavior.change_character_talkcount_for_time(0, pl_character_data.behavior.start_time)
@@ -505,8 +505,6 @@ def update_sleep():
             character_data.action_info.h_interrupt = 0
             # 重置每天第一次见面
             character_data.first_record.day_first_meet = 1
-            # 重置洗澡状态
-            character_data.sp_flag.shower = 0
             # 新：改为洗澡时清零（清零污浊状态）
             # character_data.dirty = attr_calculation.get_dirty_zero()
             # 检查并处理受精怀孕部分
@@ -518,14 +516,6 @@ def update_sleep():
                 handle_ability.gain_ability(character_id)
             # 清零H状态
             character_data.h_state = attr_calculation.get_h_state_reset(character_data.h_state)
-            # 清零催眠状态
-            if character_data.sp_flag.unconscious_h >= 4:
-                character_data.sp_flag.unconscious_h = 0
-            character_data.hypnosis.increase_body_sensitivity = False
-            character_data.hypnosis.blockhead = False
-            character_data.hypnosis.active_h = False
-            character_data.hypnosis.pain_as_pleasure = False
-            character_data.hypnosis.roleplay = 0
             # 清零睡奸中醒来状态
             character_data.sp_flag.sleep_h_awake = 0
 
@@ -806,7 +796,7 @@ def character_aotu_change_value(character_id: int, now_time: datetime.datetime, 
                     sleep_level,tem = attr_calculation.get_sleep_level(target_data.sleep_point)
                 # 熟睡等级小于等于1时判定是否吵醒
                 if sleep_level <= 1:
-                    handle_npc_ai.judge_weak_up_in_sleep_h(character_id)
+                    handle_npc_ai_in_h.judge_weak_up_in_sleep_h(character_id)
 
     # 结算非玩家部分
     else:
@@ -847,6 +837,14 @@ def character_aotu_change_value(character_id: int, now_time: datetime.datetime, 
                 enema_just = now_character_data.dirty.enema_capacity
                 default.base_chara_state_common_settle(character_id, add_time=true_add_time, state_id=17, base_value=0, ability_level=now_character_data.ability[15], extra_adjust=enema_just, tenths_add=False)
 
+            # 结算捆绑中，欲情、羞耻和苦痛增加
+            if handle_premise.handle_self_now_bondage(character_id):
+                bondage_id = now_character_data.h_state.bondage
+                bondage_data = game_config.config_bondage[bondage_id]
+                bondage_adjust = bondage_data.level * 0.5
+                default.base_chara_state_common_settle(character_id, add_time=true_add_time, state_id=12, base_value=0, ability_level=now_character_data.ability[33], extra_adjust=bondage_adjust, tenths_add=False)
+                default.base_chara_state_common_settle(character_id, add_time=true_add_time, state_id=16, base_value=0, ability_level=now_character_data.ability[34], extra_adjust=bondage_adjust, tenths_add=False)
+                default.base_chara_state_common_settle(character_id, add_time=true_add_time, state_id=17, base_value=0, ability_level=now_character_data.ability[15], extra_adjust=bondage_adjust, tenths_add=False)
 
 def settle_semen_flow(character_id: int, true_add_time: int):
     """

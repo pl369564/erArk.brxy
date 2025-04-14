@@ -31,6 +31,23 @@ class AbilityUp:
     """ 升级需求 """
 
 
+class Ai_Chat_Send_Data:
+    """ 向AI发送的数据 """
+
+    cid: int
+    """ 数据id """
+    name: str
+    """ 数据名 """
+    required: int
+    """ 是否必选 """
+    data_size: int
+    """ 数据量(1小2中3大) """
+    default: int
+    """ 是否默认已选 """
+    prompt: str
+    """ 提示词 """
+
+
 class Ai_Chat_Setting:
     """ 角色设置 """
 
@@ -154,6 +171,17 @@ class Body_Manage_Requirement:
     """ 需要数值3 """
     todo: int
     """ 未实装 """
+
+
+class Bondage:
+    """ 绳子捆绑 """
+
+    cid: int
+    """ 绳子捆绑id """
+    name: str
+    """ 绳子捆绑名 """
+    level: int
+    """ 捆绑等级 """
 
 
 class Book:
@@ -606,8 +634,21 @@ class Item:
     """ 价格 """
     effect: int
     """ 效果 """
+    h_item_id: int
+    """ h道具的id """
     info: str
     """ 描述 """
+
+
+class Item_h_equip:
+    """ H用装备型道具 """
+
+    cid: int
+    """ 道具id """
+    name: str
+    """ 道具名 """
+    item_id: int
+    """ 道具id """
 
 
 class JJ:
@@ -1196,7 +1237,6 @@ class Talk:
     """ 前提id """
     context: str
     """ 口上内容 """
-
 
 
 class TargetEffect:

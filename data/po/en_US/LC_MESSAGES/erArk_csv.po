@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-11 08:00+0800\n"
+"POT-Creation-Date: 2025-04-03 08:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LANGUAGE-TEAM-EMAIL@ADDRESS>\n"
@@ -15,18 +15,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid ""
-msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-11 08:00+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LANGUAGE-TEAM-EMAIL@ADDRESS>\n"
-"Language: en_US\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
 
 msgid "Ｎ感觉"
 msgstr "N Feel"
@@ -5504,7 +5492,7 @@ msgstr "Propose failed"
 msgid "戴上项圈失败"
 msgstr "Put on collar failed"
 
-msgid "目睹玩家与其他角色H"
+msgid "目睹玩家与其他角色H并打断"
 msgstr "Saw player doing H with others"
 
 msgid "亲吻失败"
@@ -20483,22 +20471,22 @@ msgid "开启后会在处理公务时检测各部门的运作情况，对有问�
 msgstr "On enabled, the state of all departments will be shown, and problematic spots will be hinted"
 
 msgid "是否屏蔽思考过程"
-msgstr ""
+msgstr "Enable hiding of thinking process"
 
 msgid "思考型模型会输出思考过程，选是的时候会使用正则进行屏蔽，对流式传输无效"
-msgstr ""
+msgstr "Thinking models will output the process, on enabling will hide it with proper measures"
 
 msgid "是否使用流式输出"
-msgstr ""
+msgstr "Enabling flowing output"
 
 msgid "选是的话，会在生成文本的过程中逐条输出，选否的话会在生成完毕后一次性输出"
-msgstr ""
+msgstr "Enabling will output the dialogues row by row, and will output all of them at once if disabled"
 
 msgid "囚服"
-msgstr ""
+msgstr "Prison uniform"
 
 msgid "被关押的干员穿的衣服"
-msgstr ""
+msgstr "The clothes wore by imprisoned Operators"
 
 msgid "死魂靈安撫儀式"
 msgstr ""
@@ -20691,49 +20679,49 @@ msgid "阿諾~~博士你好，經文月夫人推薦，我被派來加深與羅�
 msgstr ""
 
 msgid "囚犯训练管理"
-msgstr ""
+msgstr "Prison training management"
 
 msgid "训练效果取决于监狱长对应的属性，如部位快感训练效果取决于监狱长的部位快感能力等级"
-msgstr ""
+msgstr "Training effect depends on abilities of the Warden, such as body pleasure"
 
 msgid "不进行训练|部位快感训练|部位扩张训练|苦痛快感训练|性爱技巧训练|身体锻炼训练|心理服从训练"
-msgstr ""
+msgstr "None|Body pleasure|Body dilation|Pain pleasure|Sex technique|Body training|Mind obedience"
 
 msgid "囚犯服装管理"
-msgstr ""
+msgstr "Prisoner clothing management"
 
 msgid "服装方面的管理"
-msgstr ""
+msgstr "Clothes management"
 
 msgid "保持全裸|提供囚犯服装|提供正常服装"
-msgstr ""
+msgstr "Naked|Prisoner clothes|Normal clothes"
 
 msgid "囚犯内衣管理"
-msgstr ""
+msgstr "Prisoner innerwear management"
 
 msgid "内衣方面的管理"
-msgstr ""
+msgstr "Innerwear management"
 
 msgid "不提供内衣与袜子|提供情趣内衣与袜子|提供正常内衣与袜子"
-msgstr ""
+msgstr "No bra or socks|Sexual bra and socks|Normal bra and socks"
 
 msgid "囚犯生活条件"
-msgstr ""
+msgstr "Prisoner condition"
 
 msgid "生活条件越好，体力和气力的回复就越快，但也会为囚犯的逃跑提供更高的可能性"
-msgstr ""
+msgstr "The better the condition, the faster the recovery, but the higher chance for escaping"
 
 msgid "艰苦生活条件|标准生活条件|舒适生活条件"
-msgstr ""
+msgstr "Tough|Standard|Comfortable"
 
 msgid "调教前准备"
-msgstr ""
+msgstr "Preparation before training"
 
 msgid "在进行调教H前，需要对被调教进行哪些准备工作"
-msgstr ""
+msgstr "Before training H, choose the preparation work for targets"
 
 msgid "污浊清洗|部位润滑|持续性道具"
-msgstr ""
+msgstr "Cleaning|Lubricating|Continuous items"
 
 msgid "调教助手(未实装)"
 msgstr ""
@@ -20742,70 +20730,70 @@ msgid "在调教H中是否作为助手辅助调教，可以使用和助手相关
 msgstr ""
 
 msgid "正常位经验"
-msgstr ""
+msgstr "Missionary EXP"
 
 msgid "後背位经验"
-msgstr ""
+msgstr "Doggy EXP"
 
 msgid "对面骑乘位经验"
-msgstr ""
+msgstr "Face Cowgirl EXP"
 
 msgid "背面骑乘位经验"
-msgstr ""
+msgstr "Back Cowgirl EXP"
 
 msgid "对面座位经验"
-msgstr ""
+msgstr "Face Sitting EXP"
 
 msgid "背面座位经验"
-msgstr ""
+msgstr "Back Sitting EXP"
 
 msgid "对面立位经验"
-msgstr ""
+msgstr "Face Standing EXP"
 
 msgid "背面立位经验"
-msgstr ""
+msgstr "Back Standing EXP"
 
 msgid "对面抱位经验"
-msgstr ""
+msgstr "Face Hugging EXP"
 
 msgid "背面抱位经验"
-msgstr ""
+msgstr "Back Hugging EXP"
 
 msgid "对面卧位经验"
-msgstr ""
+msgstr "Face Laying EXP"
 
 msgid "背面卧位经验"
-msgstr ""
+msgstr "Back Laying EXP"
 
 msgid "囚犯的逃脱阈值提升至55%，监禁干员的负面刻印降级消耗-5%"
-msgstr ""
+msgstr "Escaping threshold increased to 55%, negative Engraving downgrade cost -5%"
 
 msgid "囚犯的逃脱阈值提升至75%，监禁干员的负面刻印降级消耗-15%"
-msgstr ""
+msgstr "Escaping threshold increased to 75%, negative Engraving downgrade cost -15%"
 
 msgid "囚犯的逃脱阈值提升至80%，监禁干员的负面刻印降级消耗-30%"
-msgstr ""
+msgstr "Escaping threshold increased to 80%, negative Engraving downgrade cost -30%"
 
 msgid "囚犯的逃脱阈值提升至99%，监禁干员的负面刻印降级消耗-50%"
-msgstr ""
+msgstr "Escaping threshold increased to 99%, negative Engraving downgrade cost -50%"
 
 msgid "灌肠时的消耗品，每次灌肠需要使用一瓶"
-msgstr ""
+msgstr "Consumable for lavating, once per lavation"
 
 msgid "用来进行灌肠的道具，使后穴恢复清洁状态，需要搭配灌肠液使用"
-msgstr ""
+msgstr "Item for lavation, able to clean butt hole with enema"
 
 msgid "一粒粒连起来的珠子，塞进去再拉出来时能够带来特殊的快感"
-msgstr ""
+msgstr "Connected beads that, gives special pleasure on putting in and pulling out"
 
 msgid "在戴上后会因为视觉被遮挡而增加对其他感官的敏感度，但也会让人感到不安"
-msgstr ""
+msgstr "Increase sensitivity due to lack of vision, but can also increase uncomfort"
 
 msgid "特殊材料制成的鞭子，挥舞时能发出响亮的的声音，但被抽到的人不会有疼痛感之上的影响，身上的痕迹也会几个小时内消失"
-msgstr ""
+msgstr "Whip made with special materials, producing loud sound on stroke, but no effect will be done besides pain, and the traces will be gone in hours"
 
 msgid "用于【滴蜡】的消耗品。使用了特制的材料，可以在低温下保持燃烧的状态，滴到人体上时也不会烫伤"
-msgstr ""
+msgstr "Consumable for [Wax drip]. Used special materials to keep it burning under low temperature and won't cause injuries"
 
 msgid ""
 "Ｂ：Breast  ，胸部\n"
@@ -20817,6 +20805,14 @@ msgid ""
 "Ｗ：Womb    ，子宫\n"
 "Ｎ：Normal  ，身体其他部位通用（如耳朵、尾巴、口腔、脖子、肚子、大腿、心理等）"
 msgstr ""
+"B: Breast\\n"
+"C: Clitoris\\n"
+"P: Penis\\n"
+"V: Vagina\\n"
+"A: Anus\\n"
+"U: Urethra\\n"
+"W: Womb\\n"
+"N: Normal (like ear, tail, mouth, neck, belly, leg, mentality etc.)"
 
 msgid ""
 "刻印是干员的一种特殊属性，在干员经历对她影响足够大的事件时才会获得/升级，也可以在能力提升界面消耗大量宝珠来升降级\n"
@@ -20850,20 +20846,64 @@ msgid ""
 "\n"
 "*目前恐怖刻印和反发刻印的负面效果暂未实装"
 msgstr ""
+"Engravings is a special attribute of Operators, which will be "
+"obtained/upgraded once the said Operator experienced something huge, and "
+"besides Unconscious Engraving with maximum level 6, the rest have maximum "
+"level 3\\nCurrently there's 6 Engravings, being Happy Engraving, Yield "
+"Engraving, Unconscious Engraving, Pain Engraving, Fear Engraving, Hatred "
+"Engraving\\nNegative Engravings (Fear Engraving and Hatred Engraving) can "
+"have their level reduced through Originium Arts, and removed once it reached"
+" zero\\n\\nHappy Engraving: Will be obtained/upgraded when the Operator "
+"experienced strong sexual pleasure\\n          Once they have experienced "
+"such pleasure, they would want to have more of this pleasure from inner "
+"heart, and be fallen continuously\\n          Will increase Command "
+"Execution Value during harassment/H commands, and related to body parts' "
+"sensitivity increase and promiscuous-type statuses acquirement\\n\\nYield "
+"Engraving: Will be obtained/upgraded when the Operator experienced strong "
+"humiliative actions\\n          Slowly abandon their self-esteem and pride, "
+"and starts to follow all of your commands, and sees satisfying your will as "
+"only objective of life\\n          Will increase Command Execution Value on "
+"all commands, and is the preconditions for Affiliation "
+"relationship\\n\\nUnconscious Engraving: Will be obtained/upgraded when the "
+"Operator experienced strong sexual pleasure while unconscious\\n          "
+"Even if there's no impression, but their own body will remember and get used"
+" to such beautiful feelings until when it's too late\\n          Will "
+"increase Command Execution Value during harassment/H commands, and greatly "
+"increase pleasure during unconscious rape\\n\\nPain Engraving: Will be "
+"obtained/upgraded when the Operator experienced strong painful actions\\n"
+"          Moderate lashing served as a part of education, and making the "
+"body slowly understands pain as a type of pleasure while making them "
+"listen to you?\\n          Will increase"
+" Command Execution Value for SM commands, but decrease Command Execution "
+"Value for love-type commands\\n\\nFear Engraving: Will be obtained/upgraded "
+"when the Operator experienced strong mental blow\\n          The ever-"
+"increasing mental damage will slowly close their heart, and slowly push "
+"their personality to the abyss\\n          Will decrease Command Execution "
+"Value on all commands, and their movement will be affected as the level goes"
+" higher\\n\\nHatred Engraving: Will be obtained/upgraded when the Operator "
+"experienced strong anger, suspicion and hatred\\n          As the gap of "
+"trust widens, the opposite side is the deep hatred\\n          Will greatly "
+"decrease Command Execution Value of all commands, and will reject most "
+"commands at level 1, tries to avoid interaction at level 2, and even attempt"
+" to attack at level 3\\n\\n*No implemented effects from negative Engravings "
+"yet"
 
 msgid "为了练料理，做了太多的菜，该怎么处理？"
-msgstr ""
+msgstr "Made too many dishes for training Cuisine Skill, how to deal with them?"
 
 msgid "只要是正常调味的食物，就可以在[生活娱乐区]的[取餐区]中选择【放入正常食物】，干员们会在打饭的时候取走吃掉"
-msgstr ""
+msgstr "As long as it's normal food, then you may [Put normal food] in [Entertainment Zone] - [Meal Taking Zone], Operators will take and eat during meal time"
 
 msgid ""
 "去诚恳的道歉，不行的话就多道几次歉，总会原谅你的。\n"
 "如果生气很严重，获得反发刻印或者恐怖刻印了的话，可以用源石技艺进行消除，或消耗大量宝珠来消除。"
 msgstr ""
+"Apologize sincerely, do it more than once, they'll forgive you "
+"eventually.\\nIf they have Hatred Engraving or Fear Engraving, then "
+"apologize after removing the said Engravings via Originium Arts or consuming Juels."
 
 msgid "如何获得更多的宝珠？"
-msgstr ""
+msgstr "How to get more Juels?"
 
 msgid ""
 "主界面中的每种角色状态值都对应一种宝珠，可以用来提升角色的属性，在玩家睡觉时结算\n"
@@ -20871,116 +20911,122 @@ msgid ""
 "结算时，会根据该状态值的等级，按一定比例转换成宝珠值，等级越高比例越高\n"
 "所以要获得更多的某类宝珠，就在睡觉前尽量提升该角色的该状态值的等级吧"
 msgstr ""
+"Each status on Operators represent a type of Juel to increase Operators' attributes (settle on sleep)\n"
+"\n"
+"On settlements, Juels will be obtained based on the level and value of statuses\n"
+"So to get a certain type of Juel, increase the status' level before sleep"
 
 msgid "灰色的职业该如何解锁？"
-msgstr ""
+msgstr "How to unlock grayed out Professions?"
 
 msgid ""
 "监狱长：至少有一个囚犯，且自身至少为3级陷落\n"
 "性爱练习生：在医疗区-体检科中指定了性爱练习"
 msgstr ""
+"Warden: Can be appointed in Relationship Lv3 while at least having one prisoner\n"
+"Sexual Student: Select sex training in Medical Department - Body Check Department"
 
 msgid "训练囚犯"
-msgstr ""
+msgstr "Train prisoners"
 
 msgid "滴蜡"
-msgstr ""
+msgstr "Wax dripping"
 
 msgid "戴上眼罩"
-msgstr ""
+msgstr "Put on mask"
 
 msgid "摘下眼罩"
-msgstr ""
+msgstr "Take off mask"
 
 msgid "自动精液灌肠"
-msgstr ""
+msgstr "Automatic semen lavation"
 
 msgid "开启后，如果持有灌肠套装道具，在干员的后穴里射精之后，将会自动地塞入肛塞，以进行精液灌肠，在拔出肛塞时会将灌肠用的精液喷出"
-msgstr ""
+msgstr "On enabling, if having lavation items, after ejaculating in butt hole, anal plug will be inserted automatically for semen lavation, and semen used for lavation will spilled out after taking out"
 
 msgid "干员的攻略难易度"
-msgstr ""
+msgstr "Operator's difficulty"
 
 msgid "对获得好感与信赖进行修正，仅影响正常加算时的最终乘积比例，不影响扣除结算、固定值结算等特殊结算"
-msgstr ""
+msgstr "Change the gain of Affinity and Trust, does not affect reduction or fixed calculations"
 
 msgid "极难|难|较难|标准|较易|容易|极易"
-msgstr ""
+msgstr "Extreme|Hard|Tough|Standard|Simple|Easy|Very Easy"
 
 msgid "干员的部位敏感度"
-msgstr ""
+msgstr "Operator's sensitivity"
 
 msgid "对获得部位快感进行修正，仅影响正常加算时的最终乘积比例，不影响扣除结算、固定值结算等特殊结算"
-msgstr ""
+msgstr "Change the gain of body pleasure, does not affect reduction or fixed calculations"
 
 msgid "极顿感|顿感|较顿感|标准|较敏感|敏感|极敏感"
-msgstr ""
+msgstr "Very insensitive|Insensitive|Not sensitive|Standard|Not insensitive|Sensitive|Very sensitive"
 
 msgid "干员的心智强韧度"
-msgstr ""
+msgstr "Operator's mentality"
 
 msgid "同时影响正面状态与负面状态，设为积极时对正面状态向上修正，对负面状态进行向下修正，设为消极时同理，不影响扣除结算、固定值结算等特殊结算"
-msgstr ""
+msgstr "Increase positive statuses and decrease negative statuses if optimistic, vice versa for pessimistic, does not affect reduction or fixed calculations"
 
 msgid "非常消极|消极|较消极|标准|较积极|积极|非常积极"
-msgstr ""
+msgstr "Very pessimistic|Pessimistic|Not optimistic|Standard|Not pessimistic|Optimistic|Very optimistic"
 
 msgid "博士是否和其他干员一样需要上厕所解手（该选项的优先度高于11号的全角色尿意值的增长速度选项）"
-msgstr ""
+msgstr "Does Doctor need toilet (takes priority over Urinary Value increase)"
 
 msgid "是否显示玩家的指令结算数据"
-msgstr ""
+msgstr "Enable showing player's calculations"
 
 msgid "即指令结算中玩家部分的数据，默认为是"
-msgstr ""
+msgstr "The settlements for player, default as yes"
 
 msgid "是否显示干员的指令结算数据"
-msgstr ""
+msgstr "Enable showing Operators' calculations"
 
 msgid "即指令结算中干员部分的数据，默认为是"
-msgstr ""
+msgstr "The settlements for Operators, default as yes"
 
 msgid "是否显示干员的移动文本"
-msgstr ""
+msgstr "Enabling showing Operators' movement"
 
 msgid "即干员在移动时的目的地显示文本，默认为是"
-msgstr ""
+msgstr "The movement texts for Operators, default as yes"
 
 msgid "是否显示干员的每日招呼文本"
-msgstr ""
+msgstr "Enabling daily greeting"
 
 msgid "即干员在每日招呼时的文本，默认为全显示，可改为仅显示口上招呼，或均不显示"
-msgstr ""
+msgstr "The texts during greeting, default as all, can change to Operator dialogues only or none"
 
 msgid "均不显示|全显示|仅显示口上招呼"
-msgstr ""
+msgstr "None|All|Dialogues only"
 
 msgid "【铁匠铺】：火神会在这里[维修装备]，帮助外勤的干员们修复和升级装备（未实装）"
 msgstr ""
 
 msgid "【运维部】：被安排为检修工程师干员会在这里检查罗德岛各区块的设施运行情况，发现问题后会前往有故障的地点进行[维护设施]"
-msgstr ""
+msgstr " [Operation and Maintenance Department]: Maintenance engineers appointed will check the facilities, and conduct [Maintain facilities] if there's errors"
 
 msgid "【厨房】：被安排进行烹饪的厨师干员会在这里[做饭]，烹饪食物的质量与数量与料理技能等级有关，做出来的食物会在【取餐区】供应"
-msgstr ""
+msgstr " [Kitchen]: Chefs appointed will [Cook] here, with quality and amount depends on Cuisine Skill, and will be provided in [Meal Taking Zone]"
 
 msgid "【体检科】：可以在这里详细安排干员的体检日程，系统会自动抽选符合条件的干员安排第二天进行体检"
-msgstr ""
+msgstr " [Body Check Department]: Can arrange body check schedule of Operators, and the condition fulfilling Operators will be selected for checking"
 
 msgid "【人事办公室】：被安排进行招募干员的HR干员会在这里[招募干员]，检查招募进度或者调整招募方案可以使用[招募情况]"
-msgstr ""
+msgstr " [Office]: Operators appointed will [Recruit Operators] here, [Recruitment process] can be selected to check progress or change strategy"
 
 msgid "【甲板】罗德岛上最宽广的地方，如果苦恼于房间内有人数上限，想要与超过100名干员进行群交的话，就来这里吧"
-msgstr ""
+msgstr " [Deck] Rhodes Island's widest place, if you're distressed by the limit of rooms and want to do group sex with over 100 Operators, here's the spot"
 
 msgid "【调教室】：被任命为性爱练习生的隶属系干员会来这里使用道具进行[性爱练习]"
-msgstr ""
+msgstr " [Humiliation Room]: Operators in Affiliation relationship can be appointed as sexual students to use items for [Sex practice]"
 
 msgid "【监狱长办公室】：被任命为监狱长的干员会在这里执勤，监视、管理和训练囚犯干员们，可以使用[管理监禁调教]来查看和调整监狱情况"
-msgstr ""
+msgstr " [Warden's Office]: Warden appointed will monitor, manage and train prisoners, can use [Manage prison training] to check conditions"
 
 msgid "【休息室】：监狱长晚上不会回宿舍睡觉，而是在此处休息，以免囚犯趁夜逃跑"
-msgstr ""
+msgstr " [Restroom]: Warden will sleep here instead to avoid escaping"
 
 msgid ""
 "这里是dongya，三分热度大王，在热情消退之前大概会一直会写\n"
@@ -21182,13 +21228,13 @@ msgid "4091"
 msgstr ""
 
 msgid "监狱长"
-msgstr ""
+msgstr "Warden"
 
 msgid "监狱长办公室"
-msgstr ""
+msgstr "Warden's Office"
 
 msgid "管理和训练关押区的囚犯干员，只能有一位，不能兼任助理"
-msgstr ""
+msgstr "Manage and train prisoners, up to one only, cannot be an assistant at the same time"
 
 msgid "可露希尔打折券，手绘有带小翅膀和尾巴的可爱玩偶印章，以廉价的打印纸制成。\n"
 msgstr ""
@@ -21287,18 +21333,20 @@ msgid "#B22222"
 msgstr ""
 
 msgid "妮芙"
-msgstr ""
+msgstr "Nymph"
 
 msgid "一对做成心形的印章，能够印出复杂的花纹。按照妮芙的话说，这个礼物叫作“心心相”印。"
-msgstr ""
+msgstr "A stamp in the shape of a heart, able to make complex patterns. Nymph calls it \"Heart to Heart.\""
 
 msgid ""
 "卡兹戴尔市民妮芙，通过罗德岛驻卡兹戴尔办事处加入罗德岛外勤部门。\n"
 "擅长使用心灵相关的源石技艺，配合其笞心魔的天赋，可在诸多领域发挥特长。"
 msgstr ""
+"Nymph is a citizen of Kazdel who joined the Field Operations Department through Rhodes Island's Kazdel office.\\n"
+"Her skills with mental Originium Arts and her natural gifts as a Djall have a wide range of applications."
 
 msgid "炉芯终曲阿米娅"
-msgstr ""
+msgstr "Furnace's Core Amiya"
 
 msgid "一個半透明的琥珀。曾經【嬌小的魔王】最具標誌性的法術，但她已經不再需要將任何人或事物封進永恆的停滯之中了"
 msgstr ""
@@ -21323,48 +21371,669 @@ msgid "掩面黑纱"
 msgstr ""
 
 msgid "肠内少许不适"
-msgstr ""
+msgstr "Slight uncomfort in intensites"
 
 msgid "腹部有些许鼓起"
-msgstr ""
+msgstr "Belly bulged up slightly"
 
 msgid "腹部明显鼓起"
-msgstr ""
+msgstr "Belly swelled up"
 
 msgid "腹部大的像是塞了一个皮球"
-msgstr ""
+msgstr "Belly is as big as having a ball"
 
 msgid "腹部像是临盆了一般膨胀到了极限"
-msgstr ""
+msgstr "Belly is swelled to limit as if about to give birth"
 
 msgid "后背位"
-msgstr ""
+msgstr "Doggy style"
 
 msgid "对面骑乘位"
-msgstr ""
+msgstr "Face cowgirl position"
 
 msgid "背面骑乘位"
-msgstr ""
+msgstr "Back cowgirl position"
 
 msgid "对面抱位"
-msgstr ""
+msgstr "Face hugging position"
 
 msgid "背面抱位"
-msgstr ""
+msgstr "Back hugging position"
 
 msgid "对面卧位"
-msgstr ""
+msgstr "Face laying position"
 
 msgid "背面卧位"
-msgstr ""
+msgstr "Back laying position"
 
 msgid ""
 "2.你需要针对一个给出的特定动作来描写这个场景。你的描写必须非常直白、通俗易懂，能准确体现出是谁在对谁做什么动作，角色必须完成这个动作的全过程。"
 msgstr ""
+"2.You need to describe the scene with a provided action. Your description must be straight and easy to understand, while accurately express who's the doer and target, and that the characters must finish the action."
 
 msgid "3.你可以描写两个角色的对话台词、表情、肢体动作、心理活动。在通俗易懂的基础上，可以适度地描写一些动作的细节。"
-msgstr ""
+msgstr "3.You can describe the lines, expressions, body movements and mental activities, and you may add on details under the condition of being simple."
 
 msgid ""
 "4.故事的大背景是，这是一家大型跨国医疗公司，两个角色中一位是这个医药公司的博士，也是公司的领导人之一，是青年男性。另一位是这个公司的员工，一个女性。"
+msgstr ""
+"4.The story's background is, this is a big international pharmaceutical company, and within the two character, one is the Doctor, the leader of the company, and is a male adult, while the other character is the employee of the company, and is a female."
+
+msgid "角色名"
+msgstr ""
+
+msgid "{pl_name}正在对{name}进行互动，干员的名字叫做{name}。"
+msgstr ""
+
+msgid "时间"
+msgstr ""
+
+msgid "当前的季节是{Season}，当前的时间是{time}。"
+msgstr ""
+
+msgid "地点"
+msgstr ""
+
+msgid "场景发生的地点是{Location}。"
+msgstr ""
+
+msgid "好感与信赖"
+msgstr ""
+
+msgid ""
+"如果用数字等级来表示关系好坏，0是第一次见面的陌生人，8是托付人生的亲密伴侣，那{pl_name}和{name}的关系大概是{ave_text}。"
+msgstr ""
+
+msgid "陷落"
+msgstr ""
+
+msgid "{fall_prompt}"
+msgstr ""
+
+msgid "饥饿"
+msgstr ""
+
+msgid "{name}有点饿了，想吃东西。"
+msgstr ""
+
+msgid "尿意"
+msgstr ""
+
+msgid "{name}有点想上厕所尿尿。"
+msgstr ""
+
+msgid "疲劳程度"
+msgstr ""
+
+msgid "{name}有些累了，疲劳的程度为{tired_text}。"
+msgstr ""
+
+msgid "心情"
+msgstr ""
+
+msgid "{name}的心情状态是{angry_text}。"
+msgstr ""
+
+msgid "睡眠与睡眠深度"
+msgstr ""
+
+msgid "{name}正在睡觉，睡眠的深度是{sleep_text}。"
+msgstr ""
+
+msgid "年龄素质"
+msgstr ""
+
+msgid "{name}的年龄是{age_text}。"
+msgstr ""
+
+msgid "种族"
+msgstr ""
+
+msgid "{name}的种族是{race_name}。"
+msgstr ""
+
+msgid "出身地"
+msgstr ""
+
+msgid "{name}的出生地是{birthplace_name}。"
+msgstr ""
+
+msgid "势力"
+msgstr ""
+
+msgid "{name}所属的势力是{nation_name}。"
+msgstr ""
+
+msgid "{name}是{pl_name}的女儿。"
+msgstr ""
+
+msgid "助理"
+msgstr ""
+
+msgid "{name}是{pl_name}的助理，负责协助{pl_name}的工作。"
+msgstr ""
+
+msgid "跟随"
+msgstr ""
+
+msgid "{name}正在跟随{pl_name}一起行动。"
+msgstr ""
+
+msgid "工作职业"
+msgstr ""
+
+msgid "{name}的工作是{work_name}。工作的内容是{work_description}。"
+msgstr ""
+
+msgid "访客"
+msgstr ""
+
+msgid "{name}不是公司的员工，是前来拜访的访客。"
+msgstr ""
+
+msgid "角色称呼"
+msgstr ""
+
+msgid "{name}会称呼{pl_name}为{nick_name_to_pl}，{pl_name}称呼{name}为{nick_name}。"
+msgstr ""
+
+msgid "催眠与催眠类型"
+msgstr ""
+
+msgid "{name}被{pl_name}催眠了，催眠的类型是{hypnosis_name}，催眠的效果是{hypnosis_effect}。"
+msgstr ""
+
+msgid "监禁"
+msgstr ""
+
+msgid "{name}被{pl_name}监禁在监狱里了。"
+msgstr ""
+
+msgid "时停"
+msgstr ""
+
+msgid "{name}正处在停止的时间中，无法做出任何反应。"
+msgstr ""
+
+msgid "身上穿的服装"
+msgstr ""
+
+msgid "{name}目前穿着{cloth_text}。"
+msgstr ""
+
+msgid "全素质数据"
+msgstr ""
+
+msgid "{name}的详细素质数据：{talent_text}"
+msgstr ""
+
+msgid "双手缚"
+msgstr ""
+
+msgid "后高手缚"
+msgstr ""
+
+msgid "直臂缚"
+msgstr ""
+
+msgid "直立缚"
+msgstr ""
+
+msgid "后手观音"
+msgstr ""
+
+msgid "苏秦背剑"
+msgstr ""
+
+msgid "菱绳缚"
+msgstr ""
+
+msgid "吊缚"
+msgstr ""
+
+msgid "后手吊缚"
+msgstr ""
+
+msgid "单足吊缚"
+msgstr ""
+
+msgid "驷马缚"
+msgstr ""
+
+msgid "团缚"
+msgstr ""
+
+msgid "逆团缚"
+msgstr ""
+
+msgid "龟甲缚"
+msgstr ""
+
+msgid "海老缚"
+msgstr ""
+
+msgid "護身符"
+msgstr ""
+
+msgid ""
+"拜託啦，炎蓉妹妹。博士都批准這次外勤了，還同意讓克洛斯和你一起去喔\n"
+"要是你成功把我那瓜妹妹找回來，我額外答應你一個要求如何?"
+msgstr ""
+
+msgid "婆山鎮？"
+msgstr ""
+
+msgid ""
+"嗨嗨，這裡是定期聯絡喔，刀客塔。\n"
+"雖然我們按照年小姐的描述來到了目標附近，但並沒有找到叫【婆山鎮】的聚落誒...阿勒，那是?"
+msgstr ""
+
+msgid "日月當空"
+msgstr ""
+
+msgid ""
+"萬幸還聯繫的上您，博士。長話短說，我們確實到達了任務目標婆山鎮，但卻是因不明原因進來的\n"
+"我們正在嘗試釐清狀況，會在明天6點展開下次定期聯絡"
+msgstr ""
+
+msgid "獸災"
+msgstr ""
+
+msgid "這裡是定期聯絡，博士。這裡簡直感覺不出時間流逝，日月位置永不變，還有不時來襲的獸災...看來年的妹妹確實有古怪"
+msgstr ""
+
+msgid "外來人"
+msgstr ""
+
+msgid "喔喔，居然還真能聯絡上外界。那小僧就長話短說了，此界乃夕大家的畫卷，但至於出去的辦法...嘿嘿，小僧也不甚明朗"
+msgstr ""
+
+msgid "無懼朝陽"
+msgstr ""
+
+msgid "那些墨魎...不是懼怕陽光嗎? 牠們正在襲擊鎮民!!"
+msgstr ""
+
+msgid "再啟"
+msgstr ""
+
+msgid "說來也奇怪，只要所有的畫外人都闔了眼，那這畫卷便會悄悄的變回本來的面貌，每觉醒来，都是如此，小僧早已习惯啦。"
+msgstr ""
+
+msgid "難得清醒"
+msgstr ""
+
+msgid "唉，也不知她...為何將你們困在這方寸之間。請讓我來幫忙吧，就當是，我的一點小心思"
+msgstr ""
+
+msgid "爆竹（真）"
+msgstr ""
+
+msgid "雖然黎小姐告訴了我們那些墨魎真正怕的是爆竹，但真的有用嗎? 年小姐也不怕爆竹啊，更何況是這種竹子做的..."
+msgstr ""
+
+msgid "問"
+msgstr ""
+
+msgid "如果我们也不过是画中人，随便哪天便烟消云散，怎还能如此泰然处之？"
+msgstr ""
+
+msgid "答"
+msgstr ""
+
+msgid "古鑄造物"
+msgstr ""
+
+msgid "夕大家，感謝您讓我在您的百餘幅畫卷中遊歷，小僧不勝感激。對了，炎熔施主讓我把這個交給..."
+msgstr ""
+
+msgid "晖冶寒淬照云清！"
+msgstr ""
+
+msgid "瓜妹妹，吃我一計，全长八尺宽三尺，采用泰拉前所未见的科技引爆的特大號二踢腳口牙!!"
+msgstr ""
+
+msgid "看山是山，看水是水"
+msgstr ""
+
+msgid ""
+"只记得第一个见得的，是如今的小僧，最后一个见得，还是如今的小僧\n"
+"至于中间万重山水，皆如过眼云烟，想来可能是小僧的种种念想吧"
+msgstr ""
+
+msgid "畫中人"
+msgstr ""
+
+msgid "先說好，我是看在年的面子上才來的。我從不送畫，也別用些【幹員義務】之類的藉口打擾我作畫"
+msgstr ""
+
+msgid "出畫"
+msgstr ""
+
+msgid "先別急著拒絕，黎小姐。人世間難得走一遭，不知你聽說過，源石轉錄技術嗎?"
+msgstr ""
+
+msgid "迷路小僧"
+msgstr ""
+
+msgid "既然這就是炎蓉施主提到的羅德島，而您又是她口中所言之博士，相逢即是有緣，就容小僧在此艦停留一段時日吧!"
+msgstr ""
+
+msgid ""
+"监狱长在空闲时会对空闲的囚犯进行日常训练，训练效果取决于监狱长对应的属性\n"
+"\n"
+"○部位快感训练：加权选取一个身体部位，获得部位快感和部位经验\n"
+"○部位扩张训练：加权选取一个身体部位，获得部位快感和部位扩张经验\n"
+"○苦痛快感训练：获得苦痛、N快感、苦痛快乐经验\n"
+"○性爱技巧训练：获得习得和部位经验\n"
+"○身体锻炼训练：提升体力最大值和气力最大值\n"
+"○心理服从训练：获得好意与屈服"
+msgstr ""
+
+msgid "调教助手"
+msgstr ""
+
+msgid ""
+"开启后会作为调教助手辅助H\n"
+"当博士对调教助手以外的干员进行了指令时，调教助手会从可选指令中随机选择一项，也对该干员执行\n"
+"调教助手对目标的结算将合并到博士对目标的结算中"
+msgstr ""
+
+msgid "否|一同欺负博士选择的部位|欺负博士没有选择的部位|从指定指令列表中选择"
+msgstr ""
+
+msgid "调教目标"
+msgstr ""
+
+msgid "选择调教的目标"
+msgstr ""
+
+msgid "仅调教囚犯干员|对所有干员都可以调教"
+msgstr ""
+
+msgid "助手经验"
+msgstr ""
+
+msgid "用于插进阴道里使用的震动棒，震动的强度和频率可以调节"
+msgstr ""
+
+msgid "肛门震动棒"
+msgstr ""
+
+msgid "用于插进肛门里使用的震动棒，震动的强度和频率可以调节"
+msgstr ""
+
+msgid "特殊尺寸震动棒套装"
+msgstr ""
+
+msgid "使用特殊纤维制成的绳子，除了较高的承力强度之外，经过特殊处理的表面也顺滑而不会刺痛皮肤。用来将干员捆绑起来，需要在调教室中使用"
+msgstr ""
+
+msgid "给干员戴上去之后，会无法发出声音"
+msgstr ""
+
+msgid "V震动棒"
+msgstr ""
+
+msgid "A震动棒"
+msgstr ""
+
+msgid "塔拉"
+msgstr ""
+
+msgid "AI对话用特殊指令"
+msgstr ""
+
+msgid "对面骑乘位肛交"
+msgstr ""
+
+msgid "背面骑乘位肛交"
+msgstr ""
+
+msgid "对面抱位肛交"
+msgstr ""
+
+msgid "背面抱位肛交"
+msgstr ""
+
+msgid "对面卧位肛交"
+msgstr ""
+
+msgid "背面卧位肛交"
+msgstr ""
+
+msgid "捆绑"
+msgstr ""
+
+msgid "戴上口球"
+msgstr ""
+
+msgid "解除捆绑"
+msgstr ""
+
+msgid "摘下口球"
+msgstr ""
+
+msgid "打屁股"
+msgstr ""
+
+msgid "结算口球"
+msgstr ""
+
+msgid "结算绳子捆绑"
+msgstr ""
+
+msgid ""
+"同时影响正面状态与负面状态，设为积极时对正面状态（如习得、恭顺、好意等）向上修正，对负面状态（如苦痛、恐怖、反感等）向下修正，设为消极时同理，不影响扣除结算、固定值结算等特殊结算"
+msgstr ""
+
+msgid ""
+"爱吃鸡：\n"
+"愿大家能享受小小的欢乐时光。"
+msgstr ""
+
+msgid ""
+"迷迭香是个可爱的孩子，也是罗德岛坚强的小小感染者战士，我被这样的设定背景与人物表现所吸引，东拼西凑成了一点点口上。\n"
+"\n"
+"虽然本坑有打算继续完善的计划，但做好了抛砖引玉的心理准备，\n"
+"不过此刻，三分热度的初篇已经成功憋出来，我也没什么心理负担，可以安心继续活下去了。\n"
+"谢谢你，迷迭香。"
+msgstr ""
+
+msgid "管理和训练关押区的囚犯干员(需要3级陷落且有囚犯)(只能有一位，不能兼任助理)"
+msgstr ""
+
+msgid "利用道具练习自己的性爱技巧(需要身体管理-性爱练习)"
+msgstr ""
+
+msgid "一个奇特的怀表，从未在诸国见过的制式，上面刻有四个年份日期，以及歪歪扭扭的几个字母。"
+msgstr ""
+
+msgid "#B83434"
+msgstr ""
+
+msgid "黑色假领"
+msgstr ""
+
+msgid "黑色宽外套"
+msgstr ""
+
+msgid "略破损的黑色连衣裙"
+msgstr ""
+
+msgid "黑色长筒丝袜（带腿环）"
+msgstr ""
+
+msgid "莱万汀"
+msgstr ""
+
+msgid "尖头高跟靴"
+msgstr ""
+
+msgid "干员身份牌"
+msgstr ""
+
+msgid "#4ce598"
+msgstr ""
+
+msgid "作战通讯挂耳机"
+msgstr ""
+
+msgid "罗德岛战术外套"
+msgstr ""
+
+msgid "罗德岛作战手套"
+msgstr ""
+
+msgid "日常贴身PVC连衣裙"
+msgstr ""
+
+msgid "罗德岛战术靴"
+msgstr ""
+
+msgid "“先驱者” “后继者”"
+msgstr ""
+
+msgid "弹力运动绑带"
+msgstr ""
+
+msgid ""
+"苇草，驻留罗德岛的维多利亚南部办事处期间，曾提出撤离申请，近期再次成功与罗德岛建立联络。目前正以深池名义带领小股部队在维多利亚境内活动，以救助被暴力胁迫的塔拉人为主要行动目标。\n"
+"【特殊状态更新】\n"
+"苇草，于纳斯尔莎事件后接任塔拉王位，与博士通信后以巡视王国领地与外交名义前往罗德岛开始环塔拉巡游。"
+msgstr ""
+
+msgid "#fff8dc"
+msgstr ""
+
+msgid "百合花发饰"
+msgstr ""
+
+msgid "半透明外套"
+msgstr ""
+
+msgid "丝质白色纹饰连衣裙"
+msgstr ""
+
+msgid "单手隔热手套"
+msgstr ""
+
+msgid "黑色百合纹连身丝袜"
+msgstr ""
+
+msgid "白色厚跟鞋"
+msgstr ""
+
+msgid "荒芜拉普兰德"
+msgstr ""
+
+msgid "一封异常精美的紫色邀请函，角落潦草画着一只白狼和一串葡萄。她邀请你参加一场狂欢，但无人知晓主题是什么。"
+msgstr ""
+
+msgid "拉普兰德，无业，叙拉古萨卢佐家族现任家主阿尔贝托的独女，目前已从家族脱离。拉普兰德擅长单兵作战，经常在战术攻坚与肃清作战中为罗德岛提供协助。"
+msgstr ""
+
+msgid "华丽叙拉古礼服上衣夹克"
+msgstr ""
+
+msgid "华丽叙拉古礼服连体裙"
+msgstr ""
+
+msgid "灰色长袜"
+msgstr ""
+
+msgid "不规则几何形双刃法杖"
+msgstr ""
+
+msgid "隐德来希"
+msgstr ""
+
+msgid "一条银链，上面什么也没挂。你与她最为亲近的时刻尚未到来，等到那时，她会将那份记忆凝成血晶，再正式赠予你。"
+msgstr ""
+
+msgid ""
+"隐德来希，作为卡兹戴尔情报组织玫瑰河畔的成员，曾为巴别塔提供过情报。伦蒂尼姆战争期间，隐德来希主动与罗德岛取得联系，现以访客身份留舰。\n"
+"需注意，隐德来希与罗德岛并非正式的合约关系，她与罗德岛的一切合作，均视作私人委托。"
+msgstr ""
+
+msgid "白色领巾"
+msgstr ""
+
+msgid "束腰暗黑哥特服"
+msgstr ""
+
+msgid "深红色蕾丝文胸"
+msgstr ""
+
+msgid "镂空蕾丝边丝袜"
+msgstr ""
+
+msgid "黑色高跟皮靴"
+msgstr ""
+
+msgid "月牙状大型镰刀"
+msgstr ""
+
+msgid "水灯心"
+msgstr ""
+
+msgid "一枚环环相扣的草编绳结，其寓意无法在任何现存书籍上找到。给草绳涂抹兽油是罕见的举动，但或许她只是不想让你被草梗割伤。"
+msgstr ""
+
+msgid ""
+"水灯心，本名布莉吉，游牧民。据称来自塔拉某支古老的游牧部族，其成员长久以来在平原、丘陵地区从事游牧活动，兼领天灾预警、传信相关职责。现经干员苇草推荐与罗德岛合作，在接受矿石病治疗的同时，作为狙击干员协助战斗。"
+msgstr ""
+
+msgid "部落风贴颈饰"
+msgstr ""
+
+msgid "部落长摆夹露肩贴身夹克"
+msgstr ""
+
+msgid "单边护臂"
+msgstr ""
+
+msgid "部落皮革腰带镂空露腿长裤"
+msgstr ""
+
+msgid "回旋刃"
+msgstr ""
+
+msgid "旅行露指平板鞋"
+msgstr ""
+
+msgid "部落风旅行皮革包"
+msgstr ""
+
+msgid "死芒"
+msgstr ""
+
+msgid "一本从未出版过的故事集，没有一个故事有结局。细细看去，每个没完结的故事都指向一个尚在人世的人，你自己也在其中。"
+msgstr ""
+
+msgid ""
+"死芒，本名爱布拉娜·都柏林，前“深池”领袖，该组织现已不复存在。在谨慎权衡之后，罗德岛有条件地同意与其建立一定程度的合作关系。\n"
+"经医疗部、人事部和博士共同确认，死芒的所有档案移入高权限资料库。"
+msgstr ""
+
+msgid "紫色系半透明外套"
+msgstr ""
+
+msgid "深紫白色外套式连衣裙"
+msgstr ""
+
+msgid "破洞黑紫袜"
+msgstr ""
+
+msgid "黑紫色绑带短靴"
+msgstr ""
+
+msgid "黑柄尖枪法杖"
+msgstr ""
+
+msgid "黑色骨骼风指环"
+msgstr ""
+
+msgid ""
+"4.故事的大背景是，一款叫做《明日方舟》(英文名为《Arknights》)的，由鹰角网络开发的一款策略向塔防手游。如果你知道这个游戏，请直接使用该游戏的背景，你要描写的角色都是该游戏里的同名角色。如果你不知道，这是该游戏的简要背景介绍：这是一家大型跨国医疗公司，公司名叫罗德岛，两个角色中一位是这个医药公司的博士，也是公司的领导人之一，是青年男性。另一位是这个公司的员工，一个女性。"
 msgstr ""

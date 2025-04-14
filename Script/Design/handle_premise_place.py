@@ -453,6 +453,34 @@ def handle_scene_all_unconscious_or_sleep(character_id: int) -> int:
     return 0
 
 
+@add_premise(constant_promise.Premise.SCENE_ALL_OTHERS_UNCONSCIOUS_OR_SLEEP)
+def handle_scene_all_others_unconscious_or_sleep(character_id: int) -> int:
+    """
+    该地点除了自己和交互对象以外的角色都处于无意识或睡眠状态
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data: game_type.Character = cache.character_data[character_id]
+    scene_path_str = map_handle.get_map_system_path_str_for_list(character_data.position)
+    scene_data: game_type.Scene = cache.scene_data[scene_path_str]
+    # 场景角色数大于等于2时进行检测
+    if len(scene_data.character_list) >= 2:
+        # 遍历当前角色列表
+        for chara_id in scene_data.character_list:
+            # 遍历非自己、非交互对象的角色
+            if chara_id == character_id or chara_id == character_data.target_character_id:
+                continue
+            if handle_premise.handle_unconscious_flag_ge_1(chara_id):
+                continue
+            if handle_premise.handle_action_sleep(chara_id):
+                continue
+            return 0
+        return 1
+    return 0
+
+
 @add_premise(constant_promise.Premise.SCENE_SOMEONE_IS_MASTUREBATE)
 def handle_scene_someone_is_masturebate(character_id: int) -> int:
     """
@@ -812,6 +840,34 @@ def handle_place_furniture_0(character_id: int) -> int:
     return 1
 
 
+@add_premise(constant_promise.Premise.PLACE_DOOR_LOCKABLE)
+def handle_place_door_lockable(character_id: int) -> int:
+    """
+    当前地点可以正常锁门（非内隔间锁）
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    now_position = character_data.position
+    now_scene_str = map_handle.get_map_system_path_str_for_list(now_position)
+    now_scene_data = cache.scene_data[now_scene_str]
+    return now_scene_data.close_type == 1
+
+
+@add_premise(constant_promise.Premise.PLACE_DOOR_NOT_LOCKABLE)
+def handle_place_door_not_lockable(character_id: int) -> int:
+    """
+    当前地点可以不能锁门（非内隔间锁）
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    return not handle_place_door_lockable(character_id)
+
+
 @add_premise(constant_promise.Premise.PLACE_DOOR_OPEN)
 def handle_place_door_open(character_id: int) -> int:
     """
@@ -826,6 +882,24 @@ def handle_place_door_open(character_id: int) -> int:
     now_scene_str = map_handle.get_map_system_path_str_for_list(now_position)
     now_scene_data = cache.scene_data[now_scene_str]
     if now_scene_data.close_flag == 0:
+        return 1
+    return 0
+
+
+@add_premise(constant_promise.Premise.PLACE_DOOR_CLOSE)
+def handle_place_door_close(character_id: int) -> int:
+    """
+    地点的门是锁着的（不含内隔间关门）
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    now_position = character_data.position
+    now_scene_str = map_handle.get_map_system_path_str_for_list(now_position)
+    now_scene_data = cache.scene_data[now_scene_str]
+    if now_scene_data.close_flag == 1:
         return 1
     return 0
 

@@ -2476,7 +2476,7 @@ def handle_add_large_pain_first_sex(
     # print("润滑修正", now_add_lust)
     # 欲情修正
     adjust = attr_calculation.get_pain_adjust(character_data.status_data[12])
-    adjust = adjust/3 if adjust >=2 else adjust/1.5
+    adjust = adjust/3 if adjust >=2 else adjust/2
     now_add_lust *= adjust
     # print("欲情修正", now_add_lust)
     # 痛苦刻印修正
@@ -2485,7 +2485,7 @@ def handle_add_large_pain_first_sex(
     # print("痛苦刻印修正", now_add_lust)
     # V扩张修正
     adjust = attr_calculation.get_ability_adjust(character_data.ability[9])
-    now_add_lust /= adjust
+    now_add_lust /= adjust * adjust
     # print("V扩张修正", now_add_lust)
 
     character_data.status_data[17] += now_add_lust
@@ -2516,14 +2516,14 @@ def handle_add_large_pain_first_a_sex(
     now_add_lust *= adjust
     # 欲情修正
     adjust = attr_calculation.get_pain_adjust(character_data.status_data[12])
-    adjust = adjust/3 if adjust >=2 else adjust/1.5
+    adjust = adjust/3 if adjust >=2 else adjust/2
     now_add_lust *= adjust
     # 痛苦刻印修正
     adjust = attr_calculation.get_mark_debuff_adjust(character_data.ability[15])
     now_add_lust *= adjust
     # A扩张修正
     adjust = attr_calculation.get_ability_adjust(character_data.ability[10])
-    now_add_lust /= adjust
+    now_add_lust /= adjust * adjust
 
     character_data.status_data[17] += now_add_lust
     character_data.status_data[17] = min(99999, character_data.status_data[17])
@@ -2816,6 +2816,35 @@ def handle_plural_orgasm(
 
         # 多重绝顶数据清零
         character_data.h_state.plural_orgasm_set = set()
+
+
+@settle_behavior.add_settle_second_behavior_effect(constant_effect.SecondEffect.BONDAGE_EFFECT)
+def handle_plural_orgasm(
+    character_id: int,
+    change_data: game_type.CharacterStatusChange,
+):
+    """
+    结算绳子捆绑效果(已弃用)
+    Keyword arguments:
+    character_id -- 角色id
+    change_data -- 状态变更信息记录对象
+    """
+    character_data: game_type.Character = cache.character_data[character_id]
+    if character_data.dead:
+        return
+    # 需要在捆绑中
+    if handle_premise.handle_self_not_bondage(character_id):
+        return
+
+    # 因为character_data.behavior.duration的数值为0，所以改为在Script\Design\character_behavior.py的character_aotu_change_value中进行结算
+    # bondage_id = character_data.h_state.bondage
+    # bondage_data = game_config.config_bondage[bondage_id]
+    # # 根据程度计算系数
+    # bondage_adjust = bondage_data.level * 0.5
+    # # 欲情
+    # base_chara_state_common_settle(character_id, add_time=character_data.behavior.duration, state_id=12, base_value=0, ability_level=character_data.ability[33], extra_adjust=bondage_adjust, tenths_add=False)
+    # # 苦痛
+    # base_chara_state_common_settle(character_id, add_time=character_data.behavior.duration, state_id=17, base_value=0, ability_level=character_data.ability[15], extra_adjust=bondage_adjust, tenths_add=False)
 
 
 @settle_behavior.add_settle_second_behavior_effect(constant_effect.SecondEffect.PENIS_IN_T_RESET)

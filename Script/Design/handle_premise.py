@@ -65,8 +65,33 @@ def get_weight_from_premise_dict(premise_dict: dict, character_id: int, weight_a
     target_character_id = character_data.target_character_id
     target_character_data = cache.character_data[target_character_id]
     behavior_id = character_data.behavior.behavior_id
+    target_behavior_id = target_character_data.behavior.behavior_id
     now_weight = 0 # 总权重
     now_premise_data = {} # 记录已经计算过的前提
+    fixed_weight = 0 # 固定权重
+
+    # 无意识模式判定
+    if unconscious_pass_flag == False and handle_unconscious_flag_ge_1(target_character_id):
+        # 有技艺tag的行为则直接通过
+        status_data = game_config.config_status[behavior_id]
+        if _("技艺") in status_data.tag:
+            unconscious_pass_flag = True
+        # 需要前提里有无意识的判定
+        for now_premise in premise_dict:
+            # 如果前提里有无意识，则正常通过
+            if "unconscious" in now_premise:
+                unconscious_pass_flag = True
+                break
+        # 如果没有无意识的前提，则直接返回0
+        if not unconscious_pass_flag:
+            return 0
+
+    # 口球判定
+    if handle_self_now_gag(character_id) and "self_now_gag" not in premise_dict and behavior_id not in {constant.Behavior.GAG_ON, constant.Behavior.GAG_OFF, constant.SecondBehavior.GAG}:
+        return 0
+    if handle_self_now_gag(target_character_id) and "target_now_gag" not in premise_dict and behavior_id not in {constant.Behavior.GAG_ON, constant.Behavior.GAG_OFF, constant.SecondBehavior.GAG}:
+        return 0
+
     # 遍历前提字典
     for premise in premise_dict:
         # 判断是否为权重类空白前提
@@ -74,24 +99,6 @@ def get_weight_from_premise_dict(premise_dict: dict, character_id: int, weight_a
             high_flag = True
         else:
             high_flag = False
-        # 是否必须显示
-        if not unconscious_pass_flag:
-            # 无意识模式判定
-            if unconscious_pass_flag == False and handle_unconscious_flag_ge_1(target_character_id):
-                # 有技艺tag的行为则直接通过
-                status_data = game_config.config_status[behavior_id]
-                if _("技艺") in status_data.tag:
-                    unconscious_pass_flag = True
-                # 需要前提里有无意识的判定
-                for now_premise in premise_dict:
-                    # 如果前提里有无意识，则正常通过
-                    if "unconscious" in now_premise:
-                        unconscious_pass_flag = True
-                        break
-                # 如果没有无意识的前提，则直接返回0
-                if not unconscious_pass_flag:
-                    now_weight = 0
-                    break
         # 已录入前提的判定
         if premise in now_premise_data:
             if not now_premise_data[premise]:
@@ -106,6 +113,12 @@ def get_weight_from_premise_dict(premise_dict: dict, character_id: int, weight_a
             # 综合数值前提判定
             if "CVP" in premise:
                 premise_all_value_list = premise.split("_")[1:]
+                # 如果是权重前提
+                if premise_all_value_list[1] == "Weight|0":
+                    fixed_weight = int(premise_all_value_list[-1])
+                    # 最小为1，最大为999
+                    fixed_weight = max(1, min(fixed_weight, 999))
+                    continue
                 now_add_weight = handle_comprehensive_value_premise(character_id, premise_all_value_list)
                 now_premise_data[premise] = now_add_weight
             # 其他正常口上判定
@@ -121,6 +134,9 @@ def get_weight_from_premise_dict(premise_dict: dict, character_id: int, weight_a
             else:
                 now_weight = 0
                 break
+    # 如果权重大于0且有固定权重，则变为固定权重
+    if now_weight > 0 and fixed_weight > 0:
+        now_weight = fixed_weight
     return now_weight
 
 
@@ -138,11 +154,13 @@ def handle_comprehensive_value_premise(character_id: int, premise_all_value_list
 
     # 进行主体A的判别，A1为自己，A2为交互对象，A3为指定id角色(格式为A3|15)
     if premise_all_value_list[0] == "A1":
+        final_character_id = character_id
         final_character_data = character_data
     elif premise_all_value_list[0] == "A2":
         # 如果没有交互对象，则返回0
         if character_data.target_character_id == character_id:
             return 0
+        final_character_id = character_data.target_character_id
         final_character_data = cache.character_data[character_data.target_character_id]
     elif premise_all_value_list[0][:2] == "A3":
         final_character_adv = int(premise_all_value_list[0][3:])
@@ -158,7 +176,7 @@ def handle_comprehensive_value_premise(character_id: int, premise_all_value_list
         if final_character_id == 0:
             return 0
 
-    # 进行数值B的判别,A能力,T素质,Time时间,J宝珠,E经验,S状态,F好感度,Flag作者用flag,X信赖,G攻略程度,Instruct指令,Son子嵌套事件,OtherChara其他角色在场,Dirty污浊
+    # 进行数值B的判别,A能力,T素质,Time时间,J宝珠,E经验,S状态,F好感度,Flag作者用flag,X信赖,G攻略程度,Instruct指令,Son子嵌套事件,OtherChara其他角色在场,Dirty污浊,Bondage绳子捆绑
     if len(premise_all_value_list[1]) > 1 and "Time" not in premise_all_value_list[1] and "Dirty" not in premise_all_value_list[1]:
         type_son_id = int(premise_all_value_list[1].split("|")[1])
     if "Son" in premise_all_value_list[1]:
@@ -194,40 +212,28 @@ def handle_comprehensive_value_premise(character_id: int, premise_all_value_list
                 final_value = final_character_data.dirty.body_semen[part_cid][1]
             else:
                 final_value = final_character_data.dirty.cloth_semen[part_cid][1]
+    elif premise_all_value_list[1][0] == "G":
+        final_value = attr_calculation.get_character_fall_level(final_character_id, minus_flag=True)
+    elif premise_all_value_list[1][0] == "B":
+        if "Bondage" in premise_all_value_list[1]:
+            if final_character_data.h_state.bondage == type_son_id:
+                final_value = 1
+            else:
+                final_value = 0
+
 
     # 进行方式C和数值D的判别
     judge_value = int(premise_all_value_list[3])
     # print(f"debug final_value = {final_value}, judge_value = {judge_value}")
 
-    # 攻略程度进行单独计算
+    # 攻略程度的不过0处理
     if premise_all_value_list[1][0] == "G":
-        if judge_value > 0:
-            all_talent_list = [201,202,203,204]
-            talent_id_index = 200 + judge_value
-        elif judge_value < 0:
-            all_talent_list = [211,212,213,214]
-            talent_id_index = 210 - judge_value
-        else:
-            return 0
-        # 攻略程度的运算符判定
-        if premise_all_value_list[2] == "G":
-           # 获取all_talent_list中所有比talent_id_index大的作为一个新列表
-            new_talent_list = [i for i in all_talent_list if i > talent_id_index]
-        elif premise_all_value_list[2] == "L":
-            new_talent_list = [i for i in all_talent_list if i < talent_id_index]
-        elif premise_all_value_list[2] == "E":
-            new_talent_list = [i for i in all_talent_list if i == talent_id_index]
-        elif premise_all_value_list[2] == "GE":
-            new_talent_list = [i for i in all_talent_list if i >= talent_id_index]
-        elif premise_all_value_list[2] == "LE":
-            new_talent_list = [i for i in all_talent_list if i <= talent_id_index]
-        elif premise_all_value_list[2] == "NE":
-            new_talent_list = [i for i in all_talent_list if i != talent_id_index]
-        # 最后判定
-        for talent_id in new_talent_list:
-            if final_character_data.talent[talent_id]:
-                return 1
-        return 0
+        # 如果是在大于，或者大于等于负数的情况下，则当前值最大为0
+        if premise_all_value_list[2] in {"G", "GE"} and judge_value < 0:
+            final_value = min(0, final_value)
+        # 如果是在小于，或者小于等于正数的情况下，则当前值最小为0
+        elif premise_all_value_list[2] in {"L", "LE"} and judge_value > 0:
+            final_value = max(0, final_value)
 
     # 前指令的单独计算
     if premise_all_value_list[1][0] == "I":
@@ -1357,6 +1363,34 @@ def handle_instruct_judge_low_obscenity(character_id: int) -> int:
         return 1
     return 0
 
+@add_premise(constant_promise.Premise.TARGET_INSTRUCT_JUDGE_LOW_OBSCENITY)
+def handle_target_instruct_judge_low_obscenity(character_id: int) -> int:
+    """
+    口上用：当前实行值足以对交互对象轻度性骚扰
+    输入：character_id: int - 角色id
+    输出：int - 权重
+    """
+    # 获取角色数据
+    character_data = cache.character_data[character_id]
+    target_character_id = character_data.target_character_id
+    # 如果角色没有交互对象则返回0
+    if character_id == target_character_id:
+        return 0
+    # 判断交互对象是否满足低级骚扰条件（调用计算函数判断低级骚扰）
+    if character.calculation_instuct_judege(character_id, target_character_id, _("初级骚扰"), not_draw_flag=True)[0]:
+        return 1
+    return 0
+
+
+@add_premise(constant_promise.Premise.TARGET_INSTRUCT_NOT_JUDGE_LOW_OBSCENITY)
+def handle_target_instruct_not_judge_low_obscenity(character_id: int) -> int:
+    """
+    口上用：当前实行值不足以对交互对象轻度性骚扰
+    输入：character_id: int - 角色id
+    输出：int - 权重
+    """
+    return not handle_target_instruct_judge_low_obscenity(character_id)
+
 
 @add_premise(constant_promise.Premise.INSTRUCT_JUDGE_HIGH_OBSCENITY)
 def handle_instruct_judge_high_obscenity(character_id: int) -> int:
@@ -1374,6 +1408,40 @@ def handle_instruct_judge_high_obscenity(character_id: int) -> int:
     return 0
 
 
+@add_premise(constant_promise.Premise.TARGET_INSTRUCT_JUDGE_HIGH_OBSCENITY)
+def handle_target_instruct_judge_high_obscenity(character_id: int) -> int:
+    """
+    口上用：当前实行值足以对交互对象重度性骚扰
+    参数:
+        character_id (int): 角色id
+    返回:
+        int: 权重（1 表示满足，0 表示不满足）
+    """
+    # 获取当前角色数据
+    character_data = cache.character_data[character_id]
+    # 获取交互对象id
+    target_character_id = character_data.target_character_id
+    # 如果角色没有交互对象，则直接返回0
+    if character_id == target_character_id:
+        return 0
+    # 调用评价函数判断交互对象是否满足“严重骚扰”条件
+    if character.calculation_instuct_judege(character_id, target_character_id, _("严重骚扰"), not_draw_flag=True)[0]:
+        return 1
+    return 0
+
+
+@add_premise(constant_promise.Premise.TARGET_INSTRUCT_NOT_JUDGE_HIGH_OBSCENITY)
+def handle_target_instruct_not_judge_high_obscenity(character_id: int) -> int:
+    """
+    口上用：当前实行值不足以对交互对象重度性骚扰
+    参数:
+        character_id (int): 角色id
+    返回:
+        int: 权重（1 表示满足，0 表示不满足）
+    """
+    return not handle_target_instruct_judge_high_obscenity(character_id)
+
+
 @add_premise(constant_promise.Premise.INSTRUCT_JUDGE_H)
 def handle_instruct_judge_h(character_id: int) -> int:
     """
@@ -1388,6 +1456,36 @@ def handle_instruct_judge_h(character_id: int) -> int:
     if character.calculation_instuct_judege(0, character_id, _("H模式"), not_draw_flag = True)[0]:
         return 1
     return 0
+
+
+@add_premise(constant_promise.Premise.TARGET_INSTRUCT_JUDGE_H)
+def handle_target_instruct_judge_h(character_id: int) -> int:
+    """
+    口上用：当前实行值足以对交互对象邀请H
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    target_character_id = character_data.target_character_id
+    if character_id == target_character_id:
+        return 0
+    if character.calculation_instuct_judege(character_id, target_character_id, _("H模式"), not_draw_flag = True)[0]:
+        return 1
+    return 0
+
+
+@add_premise(constant_promise.Premise.TARGET_INSTRUCT_NOT_JUDGE_H)
+def handle_target_instruct_not_judge_h(character_id: int) -> int:
+    """
+    口上用：当前实行值不足以对交互对象邀请H
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    return not handle_target_instruct_judge_h(character_id)
 
 
 @add_premise(constant_promise.Premise.INSTRUCT_JUDGE_GROUP_SEX)
@@ -4018,6 +4116,83 @@ def handle_t_sleep_h_awake_1(character_id: int) -> int:
     if handle_sleep_h_awake_0(target_chara_id):
         return 0
     return 1
+
+
+@add_premise(constant_promise.Premise.HIDDEN_SEX_MODE_0)
+def handle_hidden_sex_mode_0(character_id: int) -> int:
+    """
+    自己不在隐奸模式中
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return character_data.sp_flag.hidden_sex_mode == 0
+
+
+@add_premise(constant_promise.Premise.HIDDEN_SEX_MODE_GE_1)
+def handle_hidden_sex_mode_ge_1(character_id: int) -> int:
+    """
+    自己在某个隐奸模式中
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return character_data.sp_flag.hidden_sex_mode > 0
+
+@add_premise(constant_promise.Premise.HIDDEN_SEX_MODE_1)
+def handle_hidden_sex_mode_1(character_id: int) -> int:
+    """
+    判断角色是否处于双不隐模式中
+    参数:
+        character_id (int): 角色id
+    返回:
+        int: 权重，若角色处于双不隐模式中则返回1，否则返回0
+    """
+    character_data = cache.character_data[character_id]
+    return character_data.sp_flag.hidden_sex_mode == 1
+
+
+@add_premise(constant_promise.Premise.HIDDEN_SEX_MODE_2)
+def handle_hidden_sex_mode_2(character_id: int) -> int:
+    """
+    判断角色是否处于女隐模式中
+    参数:
+        character_id (int): 角色id
+    返回:
+        int: 权重，若角色处于女隐模式中则返回1，否则返回0
+    """
+    character_data = cache.character_data[character_id]
+    return character_data.sp_flag.hidden_sex_mode == 2
+
+
+@add_premise(constant_promise.Premise.HIDDEN_SEX_MODE_3)
+def handle_hidden_sex_mode_3(character_id: int) -> int:
+    """
+    判断角色是否处于男隐模式中
+    参数:
+        character_id (int): 角色id
+    返回:
+        int: 权重，若角色处于男隐模式中则返回1，否则返回0
+    """
+    character_data = cache.character_data[character_id]
+    return character_data.sp_flag.hidden_sex_mode == 3
+
+
+@add_premise(constant_promise.Premise.HIDDEN_SEX_MODE_4)
+def handle_hidden_sex_mode_4(character_id: int) -> int:
+    """
+    判断角色是否处于双隐模式中
+    参数:
+        character_id (int): 角色id
+    返回:
+        int: 权重，若角色处于双隐模式中则返回1，否则返回0
+    """
+    character_data = cache.character_data[character_id]
+    return character_data.sp_flag.hidden_sex_mode == 4
 
 
 @add_premise(constant_promise.Premise.FIELD_COMMISSION_0)
@@ -7028,6 +7203,57 @@ def handle_t_reproduction_period_3(character_id: int) -> int:
         return 1
     else:
         return 0
+
+
+@add_premise(constant_promise.Premise.SELF_IS_PLAYER_DAUGHTER)
+def handle_self_is_player_daughter(character_id: int) -> int:
+    """
+    校验自己是玩家的女儿
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return character_data.relationship.father_id == 0
+
+
+@add_premise(constant_promise.Premise.SELF_NOT_PLAYER_DAUGHTER)
+def handle_self_not_player_daughter(character_id: int) -> int:
+    """
+    校验自己不是玩家的女儿
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    return not handle_self_is_player_daughter(character_id)
+
+
+@add_premise(constant_promise.Premise.TARGET_IS_PLAYER_DAUGHTER)
+def handle_target_is_player_daughter(character_id: int) -> int:
+    """
+    校验交互对象是玩家的女儿
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return handle_self_is_player_daughter(character_data.target_character_id)
+
+
+@add_premise(constant_promise.Premise.TARGET_NOT_PLAYER_DAUGHTER)
+def handle_target_not_player_daughter(character_id: int) -> int:
+    """
+    校验交互对象不是玩家的女儿
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return not handle_self_is_player_daughter(character_data.target_character_id)
 
 
 # @add_premise(constant_promise.Premise.TARGET_AGE_SIMILAR)
@@ -10520,15 +10746,20 @@ def handle_last_cmd_penis_position(character_id: int) -> int:
     len_input = len(cache.input_cache)
     last_cmd = cache.input_cache[len(cache.input_cache) - 1]
     sex = {
-        str(constant.Instruct.NORMAL_SEX), str(constant.Instruct.BACK_SEX), str(constant.Instruct.RIDING_SEX),
+        str(constant.Instruct.NORMAL_SEX), str(constant.Instruct.BACK_SEX),
+        str(constant.Instruct.RIDING_SEX), str(constant.Instruct.BACK_RIDING_SEX),
         str(constant.Instruct.FACE_SEAT_SEX), str(constant.Instruct.BACK_SEAT_SEX),
         str(constant.Instruct.FACE_STAND_SEX), str(constant.Instruct.BACK_STAND_SEX),
+        str(constant.Instruct.FACE_HUG_SEX), str(constant.Instruct.BACK_HUG_SEX),
+        str(constant.Instruct.FACE_LAY_SEX), str(constant.Instruct.BACK_LAY_SEX),
         str(constant.Instruct.STIMULATE_G_POINT), str(constant.Instruct.WOMB_OS_CARESS),
         str(constant.Instruct.WOMB_INSERTION),
         str(constant.Instruct.NORMAL_ANAL_SEX), str(constant.Instruct.BACK_ANAL_SEX),
-        str(constant.Instruct.RIDING_ANAL_SEX),
+        str(constant.Instruct.RIDING_ANAL_SEX), str(constant.Instruct.BACK_RIDING_ANAL_SEX),
         str(constant.Instruct.FACE_SEAT_ANAL_SEX), str(constant.Instruct.BACK_SEAT_ANAL_SEX),
         str(constant.Instruct.FACE_STAND_ANAL_SEX), str(constant.Instruct.BACK_STAND_ANAL_SEX),
+        str(constant.Instruct.FACE_HUG_ANAL_SEX), str(constant.Instruct.BACK_HUG_ANAL_SEX),
+        str(constant.Instruct.FACE_LAY_ANAL_SEX), str(constant.Instruct.BACK_LAY_ANAL_SEX),
         str(constant.Instruct.STIMULATE_SIGMOID_COLON), str(constant.Instruct.STIMULATE_VAGINA),
         str(constant.Instruct.URETHRAL_SEX),
         str(constant.Instruct.HANDJOB), str(constant.Instruct.HAND_BLOWJOB),
@@ -10617,10 +10848,13 @@ def handle_last_cmd_sex(character_id: int) -> int:
     len_input = len(cache.input_cache)
 
     sex = {
-        str(constant.Instruct.NORMAL_SEX), str(constant.Instruct.BACK_SEX), str(constant.Instruct.RIDING_SEX),
+        str(constant.Instruct.NORMAL_SEX), str(constant.Instruct.BACK_SEX),
+        str(constant.Instruct.RIDING_SEX), str(constant.Instruct.BACK_RIDING_SEX),
         str(constant.Instruct.FACE_SEAT_SEX), str(constant.Instruct.BACK_SEAT_SEX),
         str(constant.Instruct.FACE_STAND_SEX), str(constant.Instruct.BACK_STAND_SEX),
-        str(constant.Instruct.STIMULATE_G_POINT), str(constant.Instruct.WOMB_OS_CARESS)
+        str(constant.Instruct.FACE_HUG_SEX), str(constant.Instruct.BACK_HUG_SEX),
+        str(constant.Instruct.FACE_LAY_SEX), str(constant.Instruct.BACK_LAY_SEX),
+        str(constant.Instruct.STIMULATE_G_POINT), str(constant.Instruct.WOMB_OS_CARESS),
     }
 
     for i in range(len_input):
@@ -10682,9 +10916,11 @@ def handle_last_cmd_a_sex(character_id: int) -> int:
     len_input = len(cache.input_cache)
     sex = {
         str(constant.Instruct.NORMAL_ANAL_SEX), str(constant.Instruct.BACK_ANAL_SEX),
-        str(constant.Instruct.RIDING_ANAL_SEX),
+        str(constant.Instruct.RIDING_ANAL_SEX), str(constant.Instruct.BACK_RIDING_ANAL_SEX),
         str(constant.Instruct.FACE_SEAT_ANAL_SEX), str(constant.Instruct.BACK_SEAT_ANAL_SEX),
         str(constant.Instruct.FACE_STAND_ANAL_SEX), str(constant.Instruct.BACK_STAND_ANAL_SEX),
+        str(constant.Instruct.FACE_HUG_ANAL_SEX), str(constant.Instruct.BACK_HUG_ANAL_SEX),
+        str(constant.Instruct.FACE_LAY_ANAL_SEX), str(constant.Instruct.BACK_LAY_ANAL_SEX),
         str(constant.Instruct.STIMULATE_SIGMOID_COLON), str(constant.Instruct.STIMULATE_VAGINA)
     }
 
@@ -13056,6 +13292,57 @@ def handle_target_not_patch(character_id: int) -> int:
     return not handle_self_now_patch(character_data.target_character_id)
 
 
+@add_premise(constant_promise.Premise.SELF_NOW_GAG)
+def handle_self_now_gag(character_id: int) -> int:
+    """
+    自己戴着口球
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return character_data.h_state.body_item[14][1]
+
+
+@add_premise(constant_promise.Premise.SELF_NOT_GAG)
+def handle_self_not_gag(character_id: int) -> int:
+    """
+    自己没有戴着口球
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    return not handle_self_now_gag(character_id)
+
+
+@add_premise(constant_promise.Premise.TARGET_NOW_GAG)
+def handle_target_now_gag(character_id: int) -> int:
+    """
+    交互对象戴着口球
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return handle_self_now_gag(character_data.target_character_id)
+
+
+@add_premise(constant_promise.Premise.TARGET_NOT_GAG)
+def handle_target_not_gag(character_id: int) -> int:
+    """
+    交互对象没有戴着口球
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return not handle_self_now_gag(character_data.target_character_id)
+
+
 @add_premise(constant_promise.Premise.SELF_SEELP_PIILS)
 def handle_self_sleep_pills(character_id: int) -> int:
     """
@@ -13250,6 +13537,56 @@ def handle_use_condom_in_h_ge_10(character_id: int) -> int:
     return 0
 
 
+@add_premise(constant_promise.Premise.SELF_NOW_BONDAGE)
+def handle_self_now_bondage(character_id: int) -> int:
+    """
+    自己正在被绳子捆绑
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return character_data.h_state.bondage > 0
+
+
+@add_premise(constant_promise.Premise.SELF_NOT_BONDAGE)
+def handle_self_not_bondage(character_id: int) -> int:
+    """
+    自己没有被绳子捆绑
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    return not handle_self_now_bondage(character_id)
+
+
+@add_premise(constant_promise.Premise.TARGET_NOW_BONDAGE)
+def handle_target_now_bondage(character_id: int) -> int:
+    """
+    交互对象正在被绳子捆绑
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    return handle_self_now_bondage(character_data.target_character_id)
+
+
+@add_premise(constant_promise.Premise.TARGET_NOT_BONDAGE)
+def handle_target_not_bondage(character_id: int) -> int:
+    """
+    交互对象没有被绳子捆绑
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    return not handle_target_now_bondage(character_id)
+
+
 @add_premise(constant_promise.Premise.HAVE_MILKING_MACHINE)
 def handle_have_milking_machine(character_id: int) -> int:
     """
@@ -13315,6 +13652,24 @@ def handle_have_patch(character_id: int) -> int:
     """
     character_data = cache.character_data[character_id]
     if character_data.item[132] > 0:
+        return 1
+    # 在爱情旅馆的顶级套房中则临时持有
+    if handle_h_in_love_hotel(character_id) and handle_love_hotel_room_v3(character_id):
+        return 1
+    return 0
+
+
+@add_premise(constant_promise.Premise.HAVE_GAG)
+def handle_have_gag(character_id: int) -> int:
+    """
+    校验角色是否已持有口球
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    if character_data.item[140] > 0:
         return 1
     # 在爱情旅馆的顶级套房中则临时持有
     if handle_h_in_love_hotel(character_id) and handle_love_hotel_room_v3(character_id):
@@ -16438,6 +16793,19 @@ def handle_generate_by_ai(character_id: int) -> int:
     int -- 权重
     """
     return 0
+
+
+@add_premise(constant_promise.Premise.AI_CHAT_ON)
+def handle_ai_chat_on(character_id: int) -> int:
+    """
+    AI文本生成开启中
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    cache.ai_setting.ai_chat_setting.setdefault(1, 0)
+    return cache.ai_setting.ai_chat_setting[1]
 
 
 @add_premise(constant_promise.Premise.IS_ASSISTANT)
@@ -20599,6 +20967,20 @@ def handle_self_is_child(character_id: int) -> int:
     return 0
 
 
+@add_premise(constant_promise.Premise.SELF_CHILD_OR_LOLI_1)
+def handle_self_child_or_loli_1(character_id: int) -> int:
+    """
+    校验交互对象是否幼女或萝莉==1
+    Keyword arguments:
+    character_id -- 角色id
+    Return arguments:
+    int -- 权重
+    """
+    character_data = cache.character_data[character_id]
+    if character_data.talent[102] == 1 or character_data.talent[103] == 1:
+        return 1
+    return 0
+
 @add_premise(constant_promise.Premise.T_CHILD_OR_LOLI_1)
 def handle_t_child_or_loli_1(character_id: int) -> int:
     """
@@ -20609,7 +20991,4 @@ def handle_t_child_or_loli_1(character_id: int) -> int:
     int -- 权重
     """
     character_data = cache.character_data[character_id]
-    target_data = cache.character_data[character_data.target_character_id]
-    if target_data.talent[102] == 1 or target_data.talent[103] == 1:
-        return 1
-    return 0
+    return handle_self_child_or_loli_1(character_data.target_character_id)

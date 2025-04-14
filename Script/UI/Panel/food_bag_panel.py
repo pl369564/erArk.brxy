@@ -240,6 +240,9 @@ class SeeFoodListByFoodNameDraw:
             # 自己已经吃饱了则不显示按钮
             if handle_premise.handle_hunger_le_79(0):
                 draw_button_flag = False
+            # 有交互对象且对方意识完全不清醒，则不显示按钮
+            if handle_premise.handle_have_target(0) and not handle_premise.handle_t_normal_6(0):
+                draw_button_flag = False
         else:
             # 特殊调味的情况下，如果没有目标则不显示按钮
             if character_data.target_character_id == 0:
@@ -282,8 +285,12 @@ class SeeFoodListByFoodNameDraw:
         # 特殊调味的食物则需要进行食用判定，失败则变为拒绝食用
         if now_food.special_seasoning != 0:
             if not cooking.judge_accept_special_seasoning_food(character_data.target_character_id):
+                # 味道调味则仅生气
+                if now_food.special_seasoning in [1, 2, 3, 4]:
+                    character_data.angry_point += 40
+                    character_data.sp_flag.angry_with_player = True
                 # 检测是否满足高级性骚扰的实行值需求
-                if handle_premise.handle_instruct_judge_high_obscenity(0):
+                elif handle_premise.handle_instruct_judge_high_obscenity(0):
                     character_data.behavior.behavior_id = constant.Behavior.LOW_OBSCENITY_ANUS
                     character_data.state = constant.CharacterStatus.STATUS_LOW_OBSCENITY_ANUS
                 else:

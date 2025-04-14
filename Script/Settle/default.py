@@ -11,6 +11,7 @@ from Script.Design import (
     handle_instruct,
     character_behavior,
     handle_npc_ai,
+    handle_npc_ai_in_h,
     handle_premise,
     handle_premise_place,
     clothing
@@ -714,6 +715,7 @@ def handle_nothing(
     change_data -- 状态变更信息记录对象
     now_time -- 结算的时间
     """
+    pass
 
 
 @settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.ADD_SMALL_HIT_POINT)
@@ -3218,12 +3220,71 @@ def handle_wait_unitl_traget_action_end(
     target_start_time = target_character_data.behavior.start_time
     target_end_time = game_time.get_sub_date(target_character_data.behavior.duration, old_date=target_start_time)
     # 到结束时间还有多少分钟
-    add_time = (target_end_time.timestamp() - now_time.timestamp()) / 60
+    add_time = int((target_end_time.timestamp() - now_time.timestamp()) / 60)
     character_data: game_type.Character = cache.character_data[0]
     character_data.behavior.behavior_id = constant.Behavior.WAIT
     character_data.state = constant.CharacterStatus.STATUS_WAIT
     character_data.behavior.duration = add_time
     update.game_update_flow(add_time)
+
+
+@settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.WAIT_UNITL_PLAYER_ACTION_END)
+def handle_wait_unitl_player_action_end(
+        character_id: int,
+        add_time: int,
+        change_data: game_type.CharacterStatusChange,
+        now_time: datetime.datetime,
+):
+    """
+    自己等待至玩家行动结束
+    Keyword arguments:
+    character_id -- 角色id
+    add_time -- 结算时间
+    change_data -- 状态变更信息记录对象
+    now_time -- 结算的时间
+    """
+    if not add_time:
+        return
+    character_data: game_type.Character = cache.character_data[character_id]
+    pl_character_data = cache.character_data[0]
+    if character_data.dead:
+        return
+    player_action_start_time = pl_character_data.behavior.start_time
+    player_action_end_time = game_time.get_sub_date(pl_character_data.behavior.duration, old_date=player_action_start_time)
+    # 到结束时间还有多少分钟
+    add_time = int((player_action_end_time.timestamp() - now_time.timestamp()) / 60)
+    character_data.behavior.behavior_id = constant.Behavior.WAIT
+    character_data.state = constant.CharacterStatus.STATUS_WAIT
+    character_data.behavior.duration = add_time + 1
+
+
+@settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.SET_TARGET_FOOD_FROM_BAG_LAST)
+def handle_set_target_food_from_bag_last(
+        character_id: int,
+        add_time: int,
+        change_data: game_type.CharacterStatusChange,
+        now_time: datetime.datetime,
+):
+    """
+    将自己行为目标食物指定为背包里的最后一个食物
+    Keyword arguments:
+    character_id -- 角色id
+    add_time -- 结算时间
+    change_data -- 状态变更信息记录对象
+    now_time -- 结算的时间
+    """
+    if not add_time:
+        return
+    character_data: game_type.Character = cache.character_data[character_id]
+    if len(character_data.food_bag) == 0:
+        return
+    # 获取背包最后一个食物
+    last_key = list(character_data.food_bag.keys())[-1]
+    now_food = character_data.food_bag[last_key]
+    character_data.behavior.food_name = now_food.name
+    character_data.behavior.food_seasoning = now_food.special_seasoning
+    character_data.behavior.food_quality = now_food.quality
+    character_data.behavior.target_food = now_food
 
 
 @settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.FACILITY_DAMAGE_CHECK)
@@ -4155,6 +4216,7 @@ def handle_target_enema(
     # A灌肠
     target_data.dirty.a_clean = 1
     target_data.dirty.enema_capacity += 1
+    target_data.dirty.enema_capacity = min(6, target_data.dirty.enema_capacity)
 
 
 @settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.TARGET_ENEMA_END)
@@ -4199,14 +4261,15 @@ def handle_target_enema_end(
         # 清空肠内精液量的90%
         now_semen_data = character_data.dirty.body_semen[8]
         semen_num = now_semen_data[1] * 0.9
-        now_semen_data[1] -= semen_num
-        now_semen_data[2] = attr_calculation.get_semen_now_level(now_semen_data[1], 8, 0)
-        # 绘制提示信息
-        info_text  = _("{0}的后穴喷出了{1}ml的精液\n").format(target_data.name, semen_num)
-        info_draw = draw.NormalDraw()
-        info_draw.text = info_text
-        info_draw.width = width
-        info_draw.draw()
+        if semen_num > 1:
+            now_semen_data[1] -= semen_num
+            now_semen_data[2] = attr_calculation.get_semen_now_level(now_semen_data[1], 8, 0)
+            # 绘制提示信息
+            info_text  = _("{0}的后穴喷出了{1}ml的精液\n").format(target_data.name, int(semen_num))
+            info_draw = draw.NormalDraw()
+            info_draw.text = info_text
+            info_draw.width = width
+            info_draw.draw()
     # 清空灌肠液量
     target_data.dirty.enema_capacity = 0
 
@@ -4561,6 +4624,50 @@ def handle_target_patch_off(
     character_data: game_type.Character = cache.character_data[character_id]
     target_data: game_type.Character = cache.character_data[character_data.target_character_id]
     target_data.h_state.body_item[6][1] = False
+
+
+@settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.TARGET_GAG_ON)
+def handle_target_gag_on(
+    character_id: int,
+    add_time: int,
+    change_data: game_type.CharacterStatusChange,
+    now_time: datetime.datetime,
+):
+    """
+    交互对象戴上口球
+    Keyword arguments:
+    character_id -- 角色id
+    add_time -- 结算时间
+    change_data -- 状态变更信息记录对象
+    now_time -- 结算的时间
+    """
+    if not add_time:
+        return
+    character_data: game_type.Character = cache.character_data[character_id]
+    target_data: game_type.Character = cache.character_data[character_data.target_character_id]
+    target_data.h_state.body_item[14][1] = True
+
+
+@settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.TARGET_GAG_OFF)
+def handle_target_gag_off(
+    character_id: int,
+    add_time: int,
+    change_data: game_type.CharacterStatusChange,
+    now_time: datetime.datetime,
+):
+    """
+    交互对象取下口球
+    Keyword arguments:
+    character_id -- 角色id
+    add_time -- 结算时间
+    change_data -- 状态变更信息记录对象
+    now_time -- 结算的时间
+    """
+    if not add_time:
+        return
+    character_data: game_type.Character = cache.character_data[character_id]
+    target_data: game_type.Character = cache.character_data[character_data.target_character_id]
+    target_data.h_state.body_item[14][1] = False
 
 
 @settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.ADJUST_BODY_MANAGE_DAY_ITEM)
@@ -6086,6 +6193,27 @@ def handle_shower_flag_to_1(
     character_data.sp_flag.shower = 1
 
 
+@settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.SHOWER_FLAG_TO_0)
+def handle_shower_flag_to_0(
+        character_id: int,
+        add_time: int,
+        change_data: game_type.CharacterStatusChange,
+        now_time: datetime.datetime,
+):
+    """
+    自身清零洗澡状态
+    Keyword arguments:
+    character_id -- 角色id
+    add_time -- 结算时间
+    change_data -- 状态变更信息记录对象
+    now_time -- 结算的时间
+    """
+    if not add_time:
+        return
+    character_data: game_type.Character = cache.character_data[character_id]
+    character_data.sp_flag.shower = 0
+
+
 @settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.SHOWER_FLAG_TO_2)
 def handle_shower_flag_to_2(
         character_id: int,
@@ -6534,6 +6662,70 @@ def handle_scene_all_characters_h_flag_to_1(
         handle_h_flag_to_1(chara_id, add_time, change_data, now_time)
 
 
+@settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.SELF_HIDDEN_SEX_FLAG_TO_0)
+def handle_self_hidden_sex_flag_to_0(
+        character_id: int,
+        add_time: int,
+        change_data: game_type.CharacterStatusChange,
+        now_time: datetime.datetime,
+):
+    """
+    自己清零隐奸状态
+    Keyword arguments:
+    character_id -- 角色id
+    add_time -- 结算时间
+    change_data -- 状态变更信息记录对象
+    now_time -- 结算的时间
+    """
+    if not add_time:
+        return
+    character_data: game_type.Character = cache.character_data[character_id]
+    character_data.sp_flag.hidden_sex_mode = 0
+
+
+@settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.TARGET_HIDDEN_SEX_FLAG_TO_0)
+def handle_target_hidden_sex_flag_to_0(
+        character_id: int,
+        add_time: int,
+        change_data: game_type.CharacterStatusChange,
+        now_time: datetime.datetime,
+):
+    """
+    交互对象清零隐奸状态
+    Keyword arguments:
+    character_id -- 角色id
+    add_time -- 结算时间
+    change_data -- 状态变更信息记录对象
+    now_time -- 结算的时间
+    """
+    if not add_time:
+        return
+    character_data: game_type.Character = cache.character_data[character_id]
+    handle_self_hidden_sex_flag_to_0(character_data.target_character_id, add_time, change_data, now_time)
+
+
+@settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.BOTH_HIDDEN_SEX_FLAG_TO_0)
+def handle_both_hidden_sex_flag_to_0(
+        character_id: int,
+        add_time: int,
+        change_data: game_type.CharacterStatusChange,
+        now_time: datetime.datetime,
+):
+    """
+    双方清零隐奸状态
+    Keyword arguments:
+    character_id -- 角色id
+    add_time -- 结算时间
+    change_data -- 状态变更信息记录对象
+    now_time -- 结算的时间
+    """
+    if not add_time:
+        return
+    character_data: game_type.Character = cache.character_data[character_id]
+    handle_self_hidden_sex_flag_to_0(character_id, add_time, change_data, now_time)
+    handle_self_hidden_sex_flag_to_0(character_data.target_character_id, add_time, change_data, now_time)
+
+
 @settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.UNCONSCIOUS_FLAG_TO_0)
 def handle_unconscious_flag_to_0(
         character_id: int,
@@ -6813,7 +7005,7 @@ def handle_hypnosis_flag_to_0(
         change_data: game_type.CharacterStatusChange,
         now_time: datetime.datetime, ):
     """
-    自身清零催眠系的flag状态
+    自身清零催眠系的flag与催眠子项
     Keyword arguments:
     character_id -- 角色id
     add_time -- 结算时间
@@ -6825,6 +7017,11 @@ def handle_hypnosis_flag_to_0(
     character_data: game_type.Character = cache.character_data[character_id]
     if character_data.sp_flag.unconscious_h in [4, 5, 6, 7]:
         character_data.sp_flag.unconscious_h = 0
+    character_data.hypnosis.increase_body_sensitivity = False
+    character_data.hypnosis.blockhead = False
+    character_data.hypnosis.active_h = False
+    character_data.hypnosis.pain_as_pleasure = False
+    character_data.hypnosis.roleplay = 0
 
 
 @settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.TARGET_ANGRY_WITH_PLAYER_FLAG_TO_0)
@@ -7442,9 +7639,8 @@ def handle_masturebate_add_adjust(
     if not add_time:
         return
     character_data: game_type.Character = cache.character_data[character_id]
-    from Script.Design import handle_npc_ai
     # 根据NPC的部位喜好，选择一个部位
-    part_id = handle_npc_ai.evaluate_npc_body_part_prefs(character_id)
+    part_id = handle_npc_ai_in_h.evaluate_npc_body_part_prefs(character_id)
     # 增加快感
     base_chara_state_common_settle(character_id, add_time, part_id, 50, ability_level = character_data.ability[30], change_data = change_data)
     # 增加经验
@@ -7884,6 +8080,29 @@ def handle_train_prisoners_add_adjust(
         base_chara_hp_mp_common_settle(now_prisoner_cid, add_time, hp_value=-1, mp_value=-1, dregree=1, change_data_to_target_change=change_data)
 
 
+@settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.RECOVER_FROM_UNCONSCIOUS_ADD_ADJUST)
+def handle_recover_from_unconscious_add_adjust(
+        character_id: int,
+        add_time: int,
+        change_data: game_type.CharacterStatusChange,
+        now_time: datetime.datetime,
+):
+    """
+    交互对象从无意识H中恢复意识的结算
+    Keyword arguments:
+    character_id -- 角色id
+    add_time -- 结算时间
+    change_data -- 状态变更信息记录对象
+    now_time -- 结算的时间
+    """
+    if not add_time:
+        return
+    # 如果交互对象是在H中，则进行恢复意识结算
+    character_data: game_type.Character = cache.character_data[character_id]
+    if handle_premise.handle_is_h(character_data.target_character_id):
+        handle_npc_ai_in_h.recover_from_unconscious_h(character_id)
+
+
 @settle_behavior.add_settle_behavior_effect(constant_effect.BehaviorEffect.READ_ADD_ADJUST)
 def handle_read_add_adjust(
         character_id: int,
@@ -7985,7 +8204,7 @@ def handle_teach_add_just(
 
     # 增加自己的习得和学识经验
     base_chara_state_common_settle(character_id, add_time, 9, ability_level = character_data.ability[45], change_data = change_data)
-    default_experience.handle_add_1_learn_experience(character_id, add_time, change_data, now_time)
+    default_experience.base_chara_experience_common_settle(character_id, 82)
 
     # 遍历当前场景的其他角色
     scene_path_str = map_handle.get_map_system_path_str_for_list(character_data.position)
@@ -8004,7 +8223,7 @@ def handle_teach_add_just(
 
                     # 增加习得和学识经验
                     base_chara_state_common_settle(chara_id, add_time, 9, ability_level = character_data.ability[45], change_data_to_target_change = change_data)
-                    default_experience.handle_add_1_learn_experience(chara_id, add_time, change_data, now_time)
+                    default_experience.base_chara_experience_common_settle(chara_id, 82)
 
                     # 如果老师是玩家
                     if character_id == 0:
@@ -8117,7 +8336,7 @@ def handle_eat_add_just(
         now_time: datetime.datetime,
 ):
     """
-    （进食）根据当前场景的有无目标，以及食物的调味来区分进行食用人的判断和相应的结算
+    （进食）食物结算。会根据有无交互目标，食物的调味来自动判别食用对象和结算内容
     Keyword arguments:
     character_id -- 角色id
     add_time -- 结算时间
@@ -8141,6 +8360,8 @@ def handle_eat_add_just(
 
     # 根据食物品质获得调整系数
     food_quality = character_data.behavior.food_quality
+    # 品质最小为1
+    food_quality = max(food_quality, 1)
     quality_adjust = (food_quality / 5) ** 2
     # 高品质食物额外加系数
     if food_quality == 8:
@@ -8189,9 +8410,9 @@ def handle_eat_add_just(
 
         # 精液食物则将精液加到口腔污浊，并加精液经验
         if character_data.behavior.food_seasoning in {11,12}:
-            # 加精液经验
-            default_experience.handle_target_add_1_cumsdrink_experience(0,add_time=add_time,change_data=change_data,now_time=now_time)
-            default_experience.handle_target_add_1_cums_experience(0,add_time=add_time,change_data=change_data,now_time=now_time)
+            # 加精液经验和饮精经验
+            default_experience.base_chara_experience_common_settle(chara_id, 24, change_data=target_change)
+            default_experience.base_chara_experience_common_settle(chara_id, 25, change_data=target_change)
             # 获取精液量
             now_food = character_data.behavior.target_food
             semen_ml = now_food.special_seasoning_amount

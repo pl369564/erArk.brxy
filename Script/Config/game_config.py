@@ -31,7 +31,7 @@ config_image_data: Dict[int, int] = {}
 """ 人物图片对应图片id """
 config_behavior_effect: Dict[int, config_def.BehaviorEffect] = {}
 """ 行为结算器配置 """
-config_behavior_effect_data: Dict[int, Set] = {}
+config_behavior_effect_data: Dict[int, List] = {}
 """ 行为所包含的结算器id数据 """
 config_second_behavior_effect: Dict[int, config_def.SecondEffect] = {}
 """ 二段行为结算器配置 """
@@ -125,6 +125,8 @@ config_item_tag_data: Dict[str, Set] = {}
 道具标签配置数据
 标签:道具id集合
 """
+config_h_item_index: Dict[int, int] = {}
+""" h道具id对应的道具实际cid """
 config_moon: Dict[int, config_def.Moon] = {}
 """ 月相配置 """
 config_moon_data: Dict[int, Set] = {}
@@ -318,6 +320,8 @@ config_ai_chat_setting: Dict[int, config_def.Ai_Chat_Setting] = {}
 """ 文本生成AI设置数据 设置id:详细内容 """
 config_ai_chat_setting_option: Dict[int, Dict[int, str]] = {}
 """ 文本生成AI设置数据的选项数据 设置id:选项序号:选项内容 """
+config_ai_chat_send_data: Dict[int, config_def.Ai_Chat_Send_Data] = {}
+""" 文本生成AI发送数据 设置id:详细内容 """
 config_physical_exam_setting: Dict[int, config_def.Physical_Exam_Setting] = {}
 """ 体检设置数据 设置id:详细内容 """
 config_physical_exam_setting_option: Dict[int, Dict[int, str]] = {}
@@ -360,6 +364,8 @@ config_vehicle: Dict[int, config_def.Vehicle] = {}
 """ 载具数据 """
 config_reputation_level: Dict[int, config_def.Reputation_Level] = {}
 """ 声望等级数据 """
+config_bondage: Dict[int, config_def.Bondage] = {}
+""" 绳子捆绑数据 """
 
 def load_data_json():
     """载入data.json、character.json与ui_text.json内配置数据"""
@@ -646,15 +652,25 @@ def load_behavior_effect_data():
         now_tem = config_def.BehaviorEffect()
         now_tem.__dict__ = tem_data
         config_behavior_effect[now_tem.cid] = now_tem
-        config_behavior_effect_data.setdefault(now_tem.behavior_id, set())
+        config_behavior_effect_data.setdefault(now_tem.behavior_id, [])
         # config_behavior_effect_data[now_tem.behavior_id].add(now_tem.effect_id)
 
-        if "|" not in now_tem.effect_id:
-            config_behavior_effect_data[now_tem.behavior_id].add(int(now_tem.effect_id))
+        if " - " not in now_tem.effect_id:
+            # 如果now_tem.effect_id是数字，则转为int
+            if now_tem.effect_id.isdigit():
+                config_behavior_effect_data[now_tem.behavior_id].append(int(now_tem.effect_id))
+            # 否则是字符串，直接添加
+            else:
+                config_behavior_effect_data[now_tem.behavior_id].append(now_tem.effect_id)
         else:
-            effect_list = now_tem.effect_id.split('|')
+            effect_list = now_tem.effect_id.split(' - ')
             for effect in effect_list:
-                config_behavior_effect_data[now_tem.behavior_id].add(int(effect))
+                # 如果effect是数字，则转为int
+                if effect.isdigit():
+                    config_behavior_effect_data[now_tem.behavior_id].append(int(effect))
+                # 否则是字符串，直接添加
+                else:
+                    config_behavior_effect_data[now_tem.behavior_id].append(effect)
 
 
 def load_second_behavior_effect_data():
@@ -962,6 +978,9 @@ def load_item():
         config_item[now_tem.cid] = now_tem
         config_item_tag_data.setdefault(now_tem.tag, set())
         config_item_tag_data[now_tem.tag].add(now_tem.cid)
+        # h道具的话，添加到h道具列表中
+        if now_tem.h_item_id != -1:
+            config_h_item_index[now_tem.h_item_id] = now_tem.cid
 
 
 def load_moon():
@@ -1489,6 +1508,16 @@ def load_ai_chat_setting():
             config_ai_chat_setting_option[now_tem.cid] = option_text.split('|')
 
 
+def load_ai_chat_send_data():
+    """载入文本生成AI发送数据"""
+    now_data = config_data["Ai_Chat_Send_Data"]
+    translate_data(now_data)
+    for tem_data in now_data["data"]:
+        now_tem = config_def.Ai_Chat_Send_Data()
+        now_tem.__dict__ = tem_data
+        config_ai_chat_send_data[now_tem.cid] = now_tem
+
+
 def load_physical_exam_setting():
     """载入体检设置"""
     now_data = config_data["Physical_Exam_Setting"]
@@ -1622,6 +1651,16 @@ def load_reputation_level():
         config_reputation_level[now_tem.cid] = now_tem
 
 
+def load_bondage():
+    """载入绳子捆绑数据"""
+    now_data = config_data["Bondage"]
+    translate_data(now_data)
+    for tem_data in now_data["data"]:
+        now_tem = config_def.Bondage()
+        now_tem.__dict__ = tem_data
+        config_bondage[now_tem.cid] = now_tem
+
+
     """
     draw_text_list = []
     for son_type in config_prts_data[0]:
@@ -1714,6 +1753,7 @@ def init():
     load_chara_setting()
     load_system_setting()
     load_ai_chat_setting()
+    load_ai_chat_send_data()
     load_physical_exam_setting()
     load_assistant_services()
     load_confinement_training_setting()
@@ -1730,3 +1770,4 @@ def init():
     load_commission()
     load_vehicle()
     load_reputation_level()
+    load_bondage()

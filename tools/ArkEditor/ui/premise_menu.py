@@ -280,7 +280,7 @@ class CVPMenu(QDialog):
 
         # B数值为属性，A能力,T素质,J宝珠,E经验,S状态,F好感度,X信赖
         self.cvp_b1 = QComboBox()
-        self.cvp_b1.addItems(["待选择", "好感", "信赖", "能力", "素质", "宝珠", "经验", "状态", "攻略程度", "时间", "口上用flag", "前指令", "嵌套子事件", "其他角色在场","部位污浊"])
+        self.cvp_b1.addItems(["待选择", "好感", "信赖", "能力", "素质", "宝珠", "经验", "状态", "攻略程度", "时间", "口上用flag", "前指令", "嵌套子事件", "其他角色在场", "部位污浊", "触发权重", "绳子捆绑"])
         self.cvp_b1.setCurrentIndex(0)
         self.cvp_b1.setFont(self.font)
         self.ABCD_button_layout.addWidget(self.cvp_b1)
@@ -372,6 +372,10 @@ class CVPMenu(QDialog):
             cvp_b_value = "OtherChara|0"
         elif cvp_b1 == "部位污浊":
             cvp_b_value = "Dirty|" + self.cvp_b2.currentText().split("|")[0]
+        elif cvp_b1 == "触发权重":
+            cvp_b_value = "Weight|0"
+        elif cvp_b1 == "绳子捆绑":
+            cvp_b_value = "Bondage|" + self.cvp_b2.currentText().split("|")[0]
         cvp_c = self.cvp_c.currentText()
         if cvp_c == "大于":
             cvp_c_value = "G"
@@ -417,6 +421,7 @@ class CVPMenu(QDialog):
 
     def reset_option(self):
         """重置选项"""
+        self.cvp_a.setVisible(True)
         items_count = self.cvp_a.count()
         if items_count != 3:
             self.cvp_a.clear()
@@ -473,7 +478,7 @@ class CVPMenu(QDialog):
             self.cvp_text.setText("状态值的1~10级分别为：100，500，3000，10000，30000，60000，100000，150000，500000，999999，此处使用的为状态值的具体数值，不是等级")
         elif index == 8:
             self.cvp_b2.setVisible(False)
-            self.cvp_text.setText("攻略有正数的【爱情系】和负数的【隶属系】两种路线\n爱情系的1~4分别为思慕、恋慕、恋人、爱侣，隶属系的-1~-4分别为屈从、驯服、宠物、奴隶\n备注：数值不会到0，如，当选择爱情系的≤2时，只会有2的恋慕和1的思慕，而不会到0或者负数的隶属系，其他情况同理\n同时，也因为数值不到0，如果需要有/没有陷落素质，请前往[整体修改]-[属性]-[素质]")
+            self.cvp_text.setText("攻略有正数的【爱情系】和负数的【隶属系】两种路线\n爱情系的1~4分别为思慕、恋慕、恋人、爱侣，隶属系的-1~-4分别为屈从、驯服、宠物、奴隶\n备注：数值会等于但不会越过0，如，当选择爱情系的≤2时，只会有2的恋慕、1的思慕和0的无陷落，不会到负数的隶属系，其他情况同理")
         elif index == 9:
             self.cvp_b2.setVisible(False)
             self.cvp_text.setText("时间为一天24小时制，如果要定起止时间的话，可以搭配使用【时间大于等于A】和【时间小于等于B】的两个前提来实现")
@@ -522,4 +527,18 @@ class CVPMenu(QDialog):
             for cloth_id, cloth_name in cache_control.clothing_data.items():
                 self.cvp_b2.addItem(f"C{cloth_id}|{cloth_name}")
             self.cvp_text.setText("检测部位的精液量，包括身体部位与服装部位，单位是ml\n\n如果角色没有该部位，比如没有兽角，或者没有穿内裤等，则该部位精液量固定为0")
+        elif index == 15:
+            self.cvp_a.setVisible(False)
+            self.cvp_b2.setVisible(False)
+            self.cvp_c.clear()
+            self.cvp_c.addItems(["等于"])
+            self.cvp_text.setText("自由设定触发本条目的权重，\n正整数，最小为1，最大999\n设定后将锁定为固定值，优先度高于其他任何权重计算")
+        elif index == 16:
+            self.cvp_b2.clear()
+            for bondage_id, bondage_name in cache_control.bondage_data.items():
+                self.cvp_b2.addItem(f"{bondage_id}|{bondage_name}")
+            self.cvp_b2.setCurrentIndex(0)
+            self.cvp_c.clear()
+            self.cvp_c.addItems(["等于"])
+            self.cvp_text.setText("用于判断被绳子捆绑的姿势\n等于1则为该姿势，等于0则为非该姿势")
         self.cvp_b = self.cvp_b2

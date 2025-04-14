@@ -415,14 +415,11 @@ class BODY_H_STATE:
         self.body_item: dict = {}
         """ 身体道具情况    
         编号int:[道具名str,当前有无bool,状态的结束时间datetime.datetime]    
-        部位顺序 [0"乳头夹",1"阴蒂夹",2"V震动棒",3"A震动棒",4"搾乳机",5"采尿器",6"眼罩",7"肛门拉珠",8"持续性利尿剂",9"安眠药",10"排卵促进药",11"事前避孕药",12"事后避孕药",13"避孕套"]
+        部位顺序 [0"乳头夹",1"阴蒂夹",2"V震动棒",3"A震动棒",4"搾乳机",5"采尿器",6"眼罩",7"肛门拉珠",8"持续性利尿剂",9"安眠药",10"排卵促进药",11"事前避孕药",12"事后避孕药",13"避孕套",14"口球"]
         """
 
         self.bondage: int = 0
-        """ 绳子捆绑情况    
-        编号int    
-        [0未捆绑,1后高手缚,2直立缚,3驷马捆绑,4直臂缚,5双手缚,6菱绳缚,7龟甲缚,8团缚,9逆团缚,10吊缚,11后手吊缚,12单足吊缚,13后手观音,14苏秦背剑,15五花大绑]
-        """
+        """ 绳子捆绑情况，int，见bondage.csv，0为无捆绑 """
 
         self.group_sex_body_template_dict: dict = {
             "A":[
@@ -501,6 +498,10 @@ class BODY_H_STATE:
         """ 未在模板中的NPC在群交中的AI逻辑，0为无行动，1为仅自慰，2为优先自动补位、无位则自慰，3为每次指令都重置位置后随机抢位 """
         self.pretend_sleep: bool = False
         """ 睡奸中醒来但是装睡的状态 """
+        self.sex_assist: bool = False
+        """ 性爱助手状态，False为不进行，True为进行 """
+        self.hidden_sex_discovery_dregree: int = 0
+        """ 隐奸中被发现的程度，int，初始为0，100时被发现 """
 
 
 class FIRST_RECORD:
@@ -612,6 +613,8 @@ class SPECIAL_FLAG:
         """ 在H模式中 """
         self.unconscious_h: int = 0
         """ 在无意识H模式中，int [0否,1睡眠,2醉酒,3时停,4平然,5空气,6体控,7心控] """
+        self.hidden_sex_mode: int = 0
+        """ 隐奸H模式，int [0否,1双不隐,2女隐,3男隐,4双隐] """
         self.sleep_h_awake: bool = 0
         """ 睡奸中醒来 """
         self.wait_flag: bool = 0
@@ -1100,6 +1103,10 @@ class Rhodes_Island:
         """ 调教前润滑准备 """
         self.pre_training_tool_dict: Dict[int, Tuple[int]] = {}
         """ 调教前道具使用，同BODY_H_STATE类的body_item """
+        self.sex_assistant_ai_status_list: list = []
+        """ 调教助手的AI行为状态列表 """
+        self.sex_assistant_ai_ban_status_list: list = []
+        """ 调教助手的AI禁止行为状态列表 """
 
         self.research_zone_max: int = 0
         """ 科研区设施数量上限 """
@@ -1130,6 +1137,8 @@ class System_Setting:
         """ 主界面刷新前的行数 """
         self.value_draw: Dict[str, bool] = {"pl": False, "npc": False}
         """ 数值绘制 """
+        self.character_text_version: Dict[int, int] = {}
+        """ 角色文本版本，adv_id:版本id """
 
 
 class Ai_Setting:
@@ -1148,7 +1157,8 @@ class Ai_Setting:
         """ 当前使用的代理，[0代理ip,1代理端口] """
         self.ai_chat_translator_setting: int = 0
         """ 是否开启ai聊天翻译功能，0不开启，1仅翻译地文，2翻译地文和口上 """
-
+        self.send_data_flags: Dict[int, bool] = {}
+        """ 记录向AI发送哪些数据 """
 
 class Character:
     """角色数据结构体"""

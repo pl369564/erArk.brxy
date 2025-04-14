@@ -12,7 +12,7 @@ from Script.Core import (
     constant,
     py_cmd,
 )
-from Script.Design import attr_text, map_handle, handle_instruct, handle_premise, cross_section_image, character_image, talk
+from Script.Design import attr_text, map_handle, handle_instruct, handle_premise, handle_premise_place, cross_section_image, character_image, talk
 from Script.Config import game_config
 import logging, time
 
@@ -137,18 +137,14 @@ class InScenePanel:
             #     now_draw.draw()
             #     continue
             # print("character_handle_panel.text_list :",character_handle_panel.text_list)
-            # 如果玩家的交互对象不在场景中，则将交互对象设为自己
-            if pl_character_data.target_character_id not in scene_data.character_list:
-                pl_character_data.target_character_id = 0
-            # 如果没有交互对象，而且场景中有角色，则将交互对象设为场景中的第一个角色
-            if not pl_character_data.target_character_id and len(character_list):
-                pl_character_data.target_character_id = character_list[0]
             # 游戏时间
             game_time_draw = game_info_panel.GameTimeInfoPanel(self.width / 2)
             game_time_draw.now_draw.width = len(game_time_draw)
             game_time_draw.draw()
             # 当前位置
             position_text = attr_text.get_scene_path_text(pl_character_data.position)
+            if handle_premise_place.handle_place_door_close(0):
+                position_text += _("(锁)")
             now_position_text = _("当前位置:") + position_text
             now_position_draw = draw.NormalDraw()
             now_position_draw.text = now_position_text
@@ -165,12 +161,19 @@ class InScenePanel:
             cache.wframe_mouse.w_frame_skip_wait_mouse = 0
             character_handle_panel.null_button_text = pl_character_data.target_character_id
 
-            # 开始绘制主界面标题栏
-            ask_list = []
-            if len(character_list) and pl_character_data.target_character_id not in character_list:
+            # 交互对象的处理
+            # 如果场景中有NPC角色，玩家的交互对象不是自己，也不在场景中，且则将交互对象设为场景中的第一个角色
+            if len(character_list) and pl_character_data.target_character_id != 0 and pl_character_data.target_character_id not in character_list:
                 pl_character_data.target_character_id = character_list[0]
+            # 如果场景中有角色，交互对象不在场景中，刚移动到一个新地点，则将交互对象设为场景中的第一个角色
+            if len(character_list) and pl_character_data.target_character_id not in character_list and cache.pl_pre_status_instruce[-1] == 1:
+                pl_character_data.target_character_id = character_list[0]
+            # 如果场景中没有NPC角色，则将交互对象设为自己
             if not len(character_list):
                 pl_character_data.target_character_id = 0
+
+            # 开始绘制主界面标题栏
+            ask_list = []
             if len(character_list):
                 meet_draw.draw()
                 character_handle_panel.update()
@@ -719,9 +722,10 @@ class CharacterImageListDraw:
 
             # 绘制交互对象
             player_data: game_type.Character = cache.character_data[0]
-            now_draw = CharacterImageButton(player_data.target_character_id, self.width)
-            now_draw.draw()
-            self.return_list.append(now_draw.return_text)
+            if player_data.target_character_id != 0:
+                now_draw = CharacterImageButton(player_data.target_character_id, self.width)
+                now_draw.draw()
+                self.return_list.append(now_draw.return_text)
 
             # H状态下，且玩家开启了腔内透视
             if handle_premise.handle_is_h(0) and handle_premise.handle_intermediate_penetrating_vision(0) and handle_premise.handle_penetrating_vision_on(0):

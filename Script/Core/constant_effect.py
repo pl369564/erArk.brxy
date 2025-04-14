@@ -128,7 +128,7 @@ class BehaviorEffect:
     TARGET_MOOD_TO_ANGRY = 1528
     """ 属性_基础 交互对象心情变为愤怒 """
     SCENE_ALL_CHARACTERS_DESIRE_POINT_ZERO = 1531
-    """ 属性_结构体 场景内所有角色欲望值归零 """
+    """ 属性_基础 场景内所有角色欲望值归零 """
 
     TARGET_ADD_SMALL_N_FEEL = 41
     """ 属性_状态 交互对象增加少量Ｎ快（N感补正） """
@@ -256,236 +256,59 @@ class BehaviorEffect:
     DO_H_FAILED_ADJUST = 153
     """ 属性_失败状态 邀请H失败的加反感、加愤怒、降好感度、降信赖修正 """
 
-    TARGET_ADD_1_N_EXPERIENCE = 200
-    """ 属性_经验 交互对象增加1N经验 """
-    TARGET_ADD_1_B_EXPERIENCE = 201
-    """ 属性_经验 交互对象增加1B经验 """
-    TARGET_ADD_1_C_EXPERIENCE = 202
-    """ 属性_经验 交互对象增加1C经验 """
-    TARGET_ADD_1_P_EXPERIENCE = 203
-    """ 属性_经验 交互对象增加1P经验 """
-    TARGET_ADD_1_V_EXPERIENCE = 204
-    """ 属性_经验 交互对象增加1V经验 """
-    TARGET_ADD_1_A_EXPERIENCE = 205
-    """ 属性_经验 交互对象增加1A经验 """
-    TARGET_ADD_1_U_EXPERIENCE = 206
-    """ 属性_经验 交互对象增加1U经验 """
-    TARGET_ADD_1_W_EXPERIENCE = 207
-    """ 属性_经验 交互对象增加1W经验 """
-    TARGET_ADD_1_NClimax_EXPERIENCE = 210
-    """ 属性_经验 交互对象增加1N绝顶经验+1绝顶经验 """
-    TARGET_ADD_1_BClimax_EXPERIENCE = 211
-    """ 属性_经验 交互对象增加1B绝顶经验+1绝顶经验 """
-    TARGET_ADD_1_CClimax_EXPERIENCE = 212
-    """ 属性_经验 交互对象增加1C绝顶经验+1绝顶经验 """
-    TARGET_ADD_1_VClimax_EXPERIENCE = 214
-    """ 属性_经验 交互对象增加1V绝顶经验+1绝顶经验 """
-    TARGET_ADD_1_AClimax_EXPERIENCE = 215
-    """ 属性_经验 交互对象增加1A绝顶经验+1绝顶经验 """
-    TARGET_ADD_1_UClimax_EXPERIENCE = 216
-    """ 属性_经验 交互对象增加1U绝顶经验+1绝顶经验 """
-    TARGET_ADD_1_WClimax_EXPERIENCE = 217
-    """ 属性_经验 交互对象增加1W绝顶经验+1绝顶经验 """
-    TARGET_ADD_1_Cumming_EXPERIENCE = 221
-    """ 属性_经验 交互对象增加1射精经验 """
-    TARGET_ADD_1_Milking_EXPERIENCE = 222
-    """ 属性_经验 交互对象增加1喷乳经验 """
-    TARGET_ADD_1_Peeing_EXPERIENCE = 223
-    """ 属性_经验 交互对象增加1放尿经验 """
-    TARGET_ADD_1_Cums_EXPERIENCE = 224
-    """ 属性_经验 交互对象增加1精液经验 """
-    TARGET_ADD_1_CumsDrink_EXPERIENCE = 225
-    """ 属性_经验 交互对象增加1饮精经验 """
-    TARGET_ADD_1_Creampie_EXPERIENCE = 226
-    """ 属性_经验 交互对象增加1膣射经验 """
-    TARGET_ADD_1_AnalCums_EXPERIENCE = 227
-    """ 属性_经验 交互对象增加1肛射经验 """
-    TARGET_ADD_1_plServe_EXPERIENCE = 230
-    """ 属性_经验 交互对象增加1奉仕快乐经验 """
-    TARGET_ADD_1_Love_EXPERIENCE = 231
-    """ 属性_经验 交互对象增加1爱情经验 """
-    TARGET_ADD_1_plPain_EXPERIENCE = 232
-    """ 属性_经验 交互对象增加1苦痛快乐经验 """
-    TARGET_ADD_1_plSadism_EXPERIENCE = 233
-    """ 属性_经验 交互对象增加1嗜虐快乐经验 """
-    TARGET_ADD_1_plExhibit_EXPERIENCE = 234
-    """ 属性_经验 交互对象增加1露出快乐经验 """
-    TARGET_ADD_1_Kiss_EXPERIENCE = 240
-    """ 属性_经验 交互对象增加1接吻经验 """
-    TARGET_ADD_1_Handjob_EXPERIENCE = 241
-    """ 属性_经验 交互对象增加1手淫经验 """
-    TARGET_ADD_1_Blowjob_EXPERIENCE = 242
-    """ 属性_经验 交互对象增加1口淫经验 """
-    TARGET_ADD_1_Paizuri_EXPERIENCE = 243
-    """ 属性_经验 交互对象增加1乳交经验 """
-    TARGET_ADD_1_Footjob_EXPERIENCE = 244
-    """ 属性_经验 交互对象增加1足交经验 """
-    TARGET_ADD_1_Hairjob_EXPERIENCE = 245
-    """ 属性_经验 交互对象增加1发交经验 """
-    TARGET_ADD_1_Masterbate_EXPERIENCE = 246
-    """ 属性_经验 交互对象增加1自慰经验 """
-    TARGET_ADD_1_bdsmMasterbate_EXPERIENCE = 247
-    """ 属性_经验 交互对象增加1调教自慰经验 """
-    TARGET_ADD_1_Toys_EXPERIENCE = 248
-    """ 属性_经验 交互对象增加1道具使用经验 """
-    TARGET_ADD_1_Tiedup_EXPERIENCE = 249
-    """ 属性_经验 交互对象增加1紧缚经验 """
-    TARGET_ADD_1_Insert_EXPERIENCE = 250
-    """ 属性_经验 交互对象增加1插入经验 """
-    TARGET_ADD_1_sexV_EXPERIENCE = 251
-    """ 属性_经验 交互对象增加1V性交经验 """
-    TARGET_ADD_1_sexA_EXPERIENCE = 252
-    """ 属性_经验 交互对象增加1A性交经验 """
-    TARGET_ADD_1_sexU_EXPERIENCE = 253
-    """ 属性_经验 交互对象增加1U性交经验 """
-    TARGET_ADD_1_sexW_EXPERIENCE = 254
-    """ 属性_经验 交互对象增加1W性交经验 """
-    TARGET_ADD_1_expandV_EXPERIENCE = 255
-    """ 属性_经验 交互对象增加1V扩张经验 """
-    TARGET_ADD_1_expandA_EXPERIENCE = 256
-    """ 属性_经验 交互对象增加1A扩张经验 """
-    TARGET_ADD_1_expandU_EXPERIENCE = 257
-    """ 属性_经验 交互对象增加1U扩张经验 """
-    TARGET_ADD_1_expandW_EXPERIENCE = 258
-    """ 属性_经验 交互对象增加1W扩张经验 """
-    TARGET_ADD_1_TWRape_EXPERIENCE = 259
-    """ 属性_经验 交互对象增加1时奸经验 """
-    TARGET_ADD_1_SlumberRape_EXPERIENCE = 260
-    """ 属性_经验 交互对象增加1睡奸经验 """
-    TARGET_ADD_1_Abnormal_EXPERIENCE = 261
-    """ 属性_经验 交互对象增加1异常经验 """
-    TARGET_ADD_1_Axillajob_EXPERIENCE = 262
-    """ 属性_经验 交互对象增加1腋交经验 """
-    TARGET_ADD_1_Enema_EXPERIENCE = 263
-    """ 属性_经验 交互对象增加1灌肠经验 """
-    TARGET_ADD_1_UnconsciouslyN_EXPERIENCE = 270
-    """ 属性_经验 交互对象增加1无意识N经验 """
-    TARGET_ADD_1_UnconsciouslyB_EXPERIENCE = 271
-    """ 属性_经验 交互对象增加1无意识B经验 """
-    TARGET_ADD_1_UnconsciouslyC_EXPERIENCE = 272
-    """ 属性_经验 交互对象增加1无意识C经验 """
-    TARGET_ADD_1_UnconsciouslyP_EXPERIENCE = 273
-    """ 属性_经验 交互对象增加1无意识P经验 """
-    TARGET_ADD_1_UnconsciouslyV_EXPERIENCE = 274
-    """ 属性_经验 交互对象增加1无意识V经验 """
-    TARGET_ADD_1_UnconsciouslyA_EXPERIENCE = 275
-    """ 属性_经验 交互对象增加1无意识A经验 """
-    TARGET_ADD_1_UnconsciouslyU_EXPERIENCE = 276
-    """ 属性_经验 交互对象增加1无意识U经验 """
-    TARGET_ADD_1_UnconsciouslyW_EXPERIENCE = 277
-    """ 属性_经验 交互对象增加1无意识W经验 """
-    TARGET_ADD_1_UnconsciouslyClimax_EXPERIENCE = 278
-    """ 属性_经验 交互对象增加1无意识绝顶经验 """
-    TARGET_ADD_1_UnconsciouslySex_EXPERIENCE = 279
-    """ 属性_经验 交互对象增加1无意识性交经验 """
-    TARGET_ADD_1_Chat_EXPERIENCE = 280
-    """ 属性_经验 交互对象增加1对话经验 """
-    TARGET_ADD_1_Combat_EXPERIENCE = 281
-    """ 属性_经验 交互对象增加1战斗经验 """
-    TARGET_ADD_1_Learn_EXPERIENCE = 282
-    """ 属性_经验 交互对象增加1学识经验 """
-    TARGET_ADD_1_Cooking_EXPERIENCE = 283
-    """ 属性_经验 交互对象增加1料理经验 """
-    TARGET_ADD_1_Date_EXPERIENCE = 284
-    """ 属性_经验 交互对象增加1约会经验 """
-    TARGET_ADD_1_Music_EXPERIENCE = 285
-    """ 属性_经验 交互对象增加1音乐经验 """
-    TARGET_ADD_1_GiveBirth_EXPERIENCE = 286
-    """ 属性_经验 交互对象增加1妊娠经验 """
-    TARGET_ADD_1_Command_EXPERIENCE = 288
-    """ 属性_经验 交互对象增加1指挥经验 """
-    TARGET_ADD_1_Cure_EXPERIENCE = 289
-    """ 属性_经验 交互对象增加1医疗经验 """
-    ADD_1_Kiss_EXPERIENCE = 307
-    """ 属性_经验 增加1接吻经验 """
-    ADD_1_Handjob_EXPERIENCE = 308
-    """ 属性_经验 增加1手淫经验 """
-    ADD_1_Blowjob_EXPERIENCE = 309
-    """ 属性_经验 增加1口淫经验 """
-    ADD_1_Paizuri_EXPERIENCE = 310
-    """ 属性_经验 增加1乳交经验 """
-    ADD_1_Footjob_EXPERIENCE = 311
-    """ 属性_经验 增加1足交经验 """
-    ADD_1_Hairjob_EXPERIENCE = 312
-    """ 属性_经验 增加1发交经验 """
-    ADD_1_Chat_EXPERIENCE = 313
-    """ 属性_经验 增加1对话经验 """
-    ADD_1_Combat_EXPERIENCE = 314
-    """ 属性_经验 增加1战斗经验 """
-    ADD_1_Learn_EXPERIENCE = 315
-    """ 属性_经验 增加1学识经验 """
-    ADD_1_Cooking_EXPERIENCE = 316
-    """ 属性_经验 增加1料理经验 """
-    ADD_1_Date_EXPERIENCE = 317
-    """ 属性_经验 增加1约会经验 """
-    ADD_1_Music_EXPERIENCE = 318
-    """ 属性_经验 增加1音乐经验 """
-    ADD_1_GiveBirth_EXPERIENCE = 319
-    """ 属性_经验 增加1妊娠经验 """
-    ADD_1_Insert_EXPERIENCE = 320
-    """ 属性_经验 增加1插入经验 """
-    ADD_1_Command_EXPERIENCE = 321
-    """ 属性_经验 增加1指挥经验 """
-    ADD_1_Cure_EXPERIENCE = 322
-    """ 属性_经验 增加1医疗经验 """
-    ADD_1_Cumming_EXPERIENCE = 331
-    """ 属性_经验 增加1射精经验 """
-    ADD_1_Milking_EXPERIENCE = 332
-    """ 属性_经验 增加1喷乳经验 """
-    ADD_1_Peeing_EXPERIENCE = 333
-    """ 属性_经验 增加1放尿经验 """
-    ADD_1_Cums_EXPERIENCE = 334
-    """ 属性_经验 增加1精液经验 """
-    ADD_1_CumsDrink_EXPERIENCE = 335
-    """ 属性_经验 增加1饮精经验 """
-    ADD_1_Creampie_EXPERIENCE = 336
-    """ 属性_经验 增加1膣射经验 """
-    ADD_1_AnalCums_EXPERIENCE = 337
-    """ 属性_经验 增加1肛射经验 """
-    ADD_1_Hypnosis_EXPERIENCE = 338
-    """ 属性_经验 增加1催眠经验 """
-    TARGET_ADD_1_BEEN_Hypnosis_EXPERIENCE = 339
-    """ 属性_经验 交互对象增加1被催眠经验 """
-    PLACE_ALL_CHARA_ADD_1_BEEN_Hypnosis_EXPERIENCE = 340
+    PLACE_ALL_CHARA_ADD_1_BEEN_Hypnosis_EXPERIENCE = 201
     """ 属性_经验 场景内所有其他角色均增加1被催眠经验 """
-    ADD_1_Agriculture_EXPERIENCE = 341
-    """ 属性_经验 增加1农业经验 """
-    ADD_1_Create_EXPERIENCE = 342
-    """ 属性_经验 增加1制造经验 """
-    ADD_1_Paint_EXPERIENCE = 343
-    """ 属性_经验 增加1绘画经验 """
-    ADD_1_Read_EXPERIENCE = 344
-    """ 属性_经验 增加1阅读经验 """
-    ADD_1_Read_H_EXPERIENCE = 345
-    """ 属性_经验 增加1H书阅读经验 """
-    Both_ADD_1_Learn_EXPERIENCE = 350
-    """ 属性_经验 双方增加1学识经验 """
-    ADD_1_Masterbate_EXPERIENCE = 351
-    """ 属性_经验 增加1自慰经验 """
-    ADD_1_Sleep_Sex_EXPERIENCE = 352
-    """ 属性_经验 增加1睡姦经验 """
-    ADD_1_be_Sleep_Sex_EXPERIENCE = 353
-    """ 属性_经验 增加1被睡姦经验 """
-    TARGET_ADD_1_be_Sleep_Sex_EXPERIENCE = 354
-    """ 属性_经验 交互对象增加1被睡姦经验 """
-    ADD_1_Time_Stop_Sex_EXPERIENCE = 355
-    """ 属性_经验 增加1时姦经验 """
-    ADD_1_be_Time_Stop_Sex_EXPERIENCE = 356
-    """ 属性_经验 增加1被时姦经验 """
-    TARGET_ADD_1_be_Time_Stop_Sex_EXPERIENCE = 357
-    """ 属性_经验 交互对象增加1被时姦经验 """
-    ADD_1_Hypnosis_Sex_EXPERIENCE = 358
-    """ 属性_经验 增加1催眠姦经验 """
-    ADD_1_be_Hypnosis_Sex_EXPERIENCE = 359
-    """ 属性_经验 增加1被催眠姦经验 """
-    TARGET_ADD_1_be_Hypnosis_Sex_EXPERIENCE = 360
-    """ 属性_经验 交互对象增加1被催眠姦经验 """
-    TARGET_ADD_1_CLOTH_JOB_EXPERIENCE = 361
-    """ 属性_经验 交互对象增加1服装交经验 """
-    ADD_1_GROUP_SEX_EXPERIENCE = 362
-    """ 属性_经验 增加1群交经验 """
-    ADD_1_SADISM_EXPERIENCE = 363
-    """ 属性_经验 增加1嗜虐快乐经验 """
+
+    SHOWER_FLAG_TO_0 = 301
+    """ 特殊flag_基础 自身清零洗澡状态 """
+    SHOWER_FLAG_TO_1 = 302
+    """ 特殊flag_基础 自身变成要脱衣服（洗澡）状态 """
+    SHOWER_FLAG_TO_2 = 303
+    """ 特殊flag_基础 自身变成要洗澡状态 """
+    SHOWER_FLAG_TO_3 = 304
+    """ 特殊flag_基础 自身变成要披浴巾状态 """
+    SHOWER_FLAG_TO_4 = 305
+    """ 特殊flag_基础 自身变成洗完澡状态 """
+    EAT_FOOD_FLAG_TO_0 = 311
+    """ 特殊flag_基础 自身清零吃饭状态 """
+    EAT_FOOD_FLAG_TO_1 = 312
+    """ 特殊flag_基础 自身变成要取餐状态 """
+    EAT_FOOD_FLAG_TO_2 = 313
+    """ 特殊flag_基础 自身变成要进食状态 """
+    HELP_BUY_FOOD_FLAG_TO_0 = 314
+    """ 特殊flag_基础 自身清零要帮忙买午饭状态 """
+    HELP_MAKE_FOOD_FLAG_TO_0 = 315
+    """ 特殊flag_基础 自身清零做午饭状态 """
+    SLEEP_FLAG_TO_0 = 321
+    """ 特殊flag_基础 自身清零要睡眠状态 """
+    SLEEP_FLAG_TO_1 = 322
+    """ 特殊flag_基础 自身变成要睡眠状态 """
+    REST_FLAG_TO_0 = 325
+    """ 特殊flag_基础 自身清零要休息状态 """
+    REST_FLAG_TO_1 = 326
+    """ 特殊flag_基础 自身变成要休息状态 """
+    PEE_FLAG_TO_0 = 331
+    """ 特殊flag_基础 自身清零要撒尿状态 """
+    PEE_FLAG_TO_1 = 332
+    """ 特殊flag_基础 自身变成要撒尿状态 """
+    MILK_FLAG_TO_0 = 336
+    """ 特殊flag_基础 自身清零要挤奶状态 """
+    TARGET_ANGRY_WITH_PLAYER_FLAG_TO_0 = 341
+    """ 特殊flag_基础 交互对象清零对玩家的愤怒状态 """
+    BATHHOUSE_ENTERTAINMENT_FLAG_TO_0 = 351
+    """ 特殊flag_基础 自身清零大浴场娱乐状态 """
+    BATHHOUSE_ENTERTAINMENT_FLAG_TO_1 = 352
+    """ 特殊flag_基础 自身变成大浴场娱乐_要更衣状态 """
+    BATHHOUSE_ENTERTAINMENT_FLAG_TO_2 = 353
+    """ 特殊flag_基础 自身变成大浴场娱乐_要娱乐状态 """
+    SWIM_FLAG_TO_1 = 356
+    """ 特殊flag_基础 自身变成要换泳衣状态 """
+    SWIM_FLAG_TO_2 = 357
+    """ 特殊flag_基础 自身变成要游泳状态 """
+    CANCEL_ALL_WORK_AND_ENTERTAINMENT_FLAG = 361
+    """ 特殊flag_基础 自身取消所有工作和娱乐状态 """
+    MAINTENANCE_FLAG_TO_0 = 371
+    """ 特殊flag_基础 自身清零要检修状态 """
 
     DIRTY_RESET = 401
     """ 属性_结构体 污浊结构体归零 """
@@ -507,91 +330,49 @@ class BehaviorEffect:
     """ 属性_结构体 角色上线，加入从当前干员列表，进入地图 """
 
     T_BE_BAGGED = 451
-    """ 属性_特殊flag 交互对象变成被装袋搬走状态 """
+    """ 特殊flag_H 交互对象变成被装袋搬走状态 """
     T_BE_IMPRISONMENT = 452
-    """ 属性_特殊flag 交互对象变成被监禁状态 """
-    SHOWER_FLAG_TO_1 = 453
-    """ 属性_特殊flag 自身变成要脱衣服（洗澡）状态 """
-    SHOWER_FLAG_TO_2 = 454
-    """ 属性_特殊flag 自身变成要洗澡状态 """
-    SHOWER_FLAG_TO_3 = 455
-    """ 属性_特殊flag 自身变成要披浴巾状态 """
-    SHOWER_FLAG_TO_4 = 456
-    """ 属性_特殊flag 自身变成洗完澡状态 """
-    EAT_FOOD_FLAG_TO_0 = 457
-    """ 属性_特殊flag 自身清零吃饭状态 """
-    EAT_FOOD_FLAG_TO_1 = 458
-    """ 属性_特殊flag 自身变成要取餐状态 """
-    EAT_FOOD_FLAG_TO_2 = 459
-    """ 属性_特殊flag 自身变成要进食状态 """
-    SLEEP_FLAG_TO_0 = 460
-    """ 属性_特殊flag 自身清零要睡眠状态 """
-    SLEEP_FLAG_TO_1 = 461
-    """ 属性_特殊flag 自身变成要睡眠状态 """
-    REST_FLAG_TO_0 = 462
-    """ 属性_特殊flag 自身清零要休息状态 """
-    REST_FLAG_TO_1 = 463
-    """ 属性_特殊flag 自身变成要休息状态 """
-    PEE_FLAG_TO_0 = 464
-    """ 属性_特殊flag 自身清零要撒尿状态 """
-    PEE_FLAG_TO_1 = 465
-    """ 属性_特殊flag 自身变成要撒尿状态 """
-    SWIM_FLAG_TO_1 = 466
-    """ 属性_特殊flag 自身变成要换泳衣状态 """
-    SWIM_FLAG_TO_2 = 467
-    """ 属性_特殊flag 自身变成要游泳状态 """
-    MAINTENANCE_FLAG_TO_0 = 468
-    """ 属性_特殊flag 自身清零要检修状态 """
-    CANCEL_ALL_WORK_AND_ENTERTAINMENT_FLAG = 469
-    """ 属性_特殊flag 自身取消所有工作和娱乐状态 """
-    H_FLAG_TO_0 = 475
-    """ 属性_特殊flag 自身清零H状态 """
-    H_FLAG_TO_1 = 476
-    """ 属性_特殊flag 自身变成H状态 """
-    T_H_FLAG_TO_0 = 477
-    """ 属性_特殊flag 交互对象清零H状态 """
-    T_H_FLAG_TO_1 = 478
-    """ 属性_特殊flag 交互对象变成H状态 """
-    SCENE_ALL_CHARACTERS_H_FLAG_TO_1 = 479
-    """ 属性_特殊flag 场景内所有角色变成H状态 """
+    """ 特殊flag_H 交互对象变成被监禁状态 """
+    MASTUREBATE_FLAG_TO_0 = 456
+    """ 特殊flag_H 自身清零要自慰状态 """
+    MASTUREBATE_BEFORE_SLEEP_FLAG_TO_0 = 457
+    """ 特殊flag_H 自身清零要睡前自慰状态 """
+    MASTUREBATE_BEFORE_SLEEP_FLAG_TO_2 = 458
+    """ 特殊flag_H 自身变为已睡前自慰状态 """
+    H_FLAG_TO_0 = 461
+    """ 特殊flag_H 自身清零H状态 """
+    H_FLAG_TO_1 = 462
+    """ 特殊flag_H 自身变成H状态 """
+    T_H_FLAG_TO_0 = 463
+    """ 特殊flag_H 交互对象清零H状态 """
+    T_H_FLAG_TO_1 = 464
+    """ 特殊flag_H 交互对象变成H状态 """
+    SCENE_ALL_CHARACTERS_H_FLAG_TO_1 = 465
+    """ 特殊flag_H 场景内所有角色变成H状态 """
+    SELF_HIDDEN_SEX_FLAG_TO_0 = 471
+    """ 特殊flag_H 自己清零隐奸状态 """
+    TARGET_HIDDEN_SEX_FLAG_TO_0 = 472
+    """ 特殊flag_H 交互对象清零隐奸状态 """
+    BOTH_HIDDEN_SEX_FLAG_TO_0 = 473
+    """ 特殊flag_H 双方清零隐奸状态 """
     UNCONSCIOUS_FLAG_TO_0 = 481
-    """ 属性_特殊flag 自身清零无意识状态 """
+    """ 特殊flag_H 自身清零无意识状态 """
     UNCONSCIOUS_FLAG_TO_1 = 482
-    """ 属性_特殊flag 自身变成无意识_睡眠状态 """
+    """ 特殊flag_H 自身变成无意识_睡眠状态 """
     UNCONSCIOUS_FLAG_TO_2 = 483
-    """ 属性_特殊flag 自身变成无意识_醉酒状态 """
+    """ 特殊flag_H 自身变成无意识_醉酒状态 """
     UNCONSCIOUS_FLAG_TO_3 = 484
-    """ 属性_特殊flag 自身变成无意识_时停状态 """
+    """ 特殊flag_H 自身变成无意识_时停状态 """
     UNCONSCIOUS_FLAG_TO_4 = 485
-    """ 属性_特殊flag 自身变成无意识_空气状态 """
+    """ 特殊flag_H 自身变成无意识_空气状态 """
     UNCONSCIOUS_FLAG_TO_5 = 486
-    """ 属性_特殊flag 自身变成无意识_平然状态 """
+    """ 特殊flag_H 自身变成无意识_平然状态 """
     UNCONSCIOUS_FLAG_TO_6 = 487
-    """ 属性_特殊flag 自身变成无意识_心控状态 """
+    """ 特殊flag_H 自身变成无意识_心控状态 """
     UNCONSCIOUS_FLAG_TO_7 = 488
-    """ 属性_特殊flag 自身变成无意识_体控状态 """
-    HELP_BUY_FOOD_FLAG_TO_0 = 489
-    """ 属性_特殊flag 自身清零要帮忙买午饭状态 """
-    HELP_MAKE_FOOD_FLAG_TO_0 = 490
-    """ 属性_特殊flag 自身清零做午饭状态 """
-    BATHHOUSE_ENTERTAINMENT_FLAG_TO_0 = 491
-    """ 属性_特殊flag 自身清零大浴场娱乐状态 """
-    BATHHOUSE_ENTERTAINMENT_FLAG_TO_1 = 492
-    """ 属性_特殊flag 自身变成大浴场娱乐_要更衣状态 """
-    BATHHOUSE_ENTERTAINMENT_FLAG_TO_2 = 493
-    """ 属性_特殊flag 自身变成大浴场娱乐_要娱乐状态 """
-    MILK_FLAG_TO_0 = 494
-    """ 属性_特殊flag 自身清零要挤奶状态 """
-    HYPNOSIS_FLAG_TO_0 = 495
-    """ 属性_特殊flag 自身清零催眠系的flag状态 """
-    TARGET_ANGRY_WITH_PLAYER_FLAG_TO_0 = 496
-    """ 属性_特殊flag 交互对象清零对玩家的愤怒状态 """
-    MASTUREBATE_FLAG_TO_0 = 497
-    """ 属性_特殊flag 自身清零要自慰状态 """
-    MASTUREBATE_BEFORE_SLEEP_FLAG_TO_0 = 498
-    """ 属性_特殊flag 自身清零要睡前自慰状态 """
-    MASTUREBATE_BEFORE_SLEEP_FLAG_TO_2 = 499
-    """ 属性_特殊flag 自身变为已睡前自慰状态 """
+    """ 特殊flag_H 自身变成无意识_体控状态 """
+    HYPNOSIS_FLAG_TO_0 = 489
+    """ 特殊flag_H 自身清零催眠系的flag与催眠子项 """
 
     TALK_ADD_ADJUST = 501
     """ 指令_专用结算 （聊天用）根据发起者的话术技能进行双方的好感度、好意、快乐调整，并记录当前谈话时间 """
@@ -624,7 +405,7 @@ class BehaviorEffect:
     SET_FREE_ADD_ADJUST = 515
     """ 指令_专用结算 （解除囚禁）交互对象失去监禁flag，从囚犯数据中删除 """
     EAT_ADD_ADJUST = 516
-    """ 指令_专用结算 （进食）食物结算。会根据有无交互目标，食物的调味来自动判别食用对象和结算内容。需要搭配删除当前食物食用 """
+    """ 指令_专用结算 （进食）食物结算。会根据有无交互目标，食物的调味来自动判别食用对象和结算内容。需要搭配删除当前食物使用 """
     # REFUSE_EAT_ADD_ADJUST = 517
     # """ 指令_专用结算 （拒绝进食）吃掉该食物 """
     INVITE_VISITOR_ADD_ADJUST = 518
@@ -662,6 +443,8 @@ class BehaviorEffect:
     """ 指令_专用结算 （维护设施用）修复当前地点的损坏设施 """
     TRAIN_PRISONERS_ADD_ADJUST = 535
     """ 指令_专用结算 （训练囚犯用）对所有被关押的囚犯进行日常训练 """
+    RECOVER_FROM_UNCONSCIOUS_ADD_ADJUST = 536
+    """ 指令_专用结算 交互对象从无意识H中恢复意识的结算 """
 
     CHANGE_UNDERWERA = 601
     """ 属性_服装 换新的内衣（胸衣+内裤） """
@@ -881,6 +664,10 @@ class BehaviorEffect:
     """ 道具_增减 交互对象戴上眼罩 """
     TARGET_PATCH_OFF = 926
     """ 道具_增减 交互对象取下眼罩 """
+    TARGET_GAG_ON = 927
+    """ 道具_增减 交互对象戴上口球 """
+    TARGET_GAG_OFF = 928
+    """ 道具_增减 交互对象取下口球 """
     ADJUST_BODY_MANAGE_DAY_ITEM = 931
     """ 道具_增减 调整自己的身体管理_白天道具 """
     ADJUST_BODY_MANAGE_SLEEP_ITEM = 932
@@ -1064,6 +851,10 @@ class BehaviorEffect:
 
     WAIT_UNITL_TRAGET_ACTION_END = 1701
     """ 行动 玩家等待至交互对象行动结束 """
+    WAIT_UNITL_PLAYER_ACTION_END = 1702
+    """ 行动 自己等待至玩家行动结束 """
+    SET_TARGET_FOOD_FROM_BAG_LAST = 1711
+    """ 行动 将自己行为目标食物指定为背包里的最后一个食物 """
 
     FACILITY_DAMAGE_CHECK = 1751
     """ 设施 几率判定自己所在地点是否造成损坏 """
@@ -1286,6 +1077,8 @@ class SecondEffect:
     """ 结算额外绝顶(痛苦+恐怖) """
     PLURAL_ORGASM = 409
     """ 结算多重绝顶(快乐+屈服) """
+    BONDAGE_EFFECT = 410
+    """ 结算绳子捆绑效果(已弃用) """
 
     PENIS_IN_T_RESET = 501
     """ 改变当前阴茎位置为交互对象_双方归零 """

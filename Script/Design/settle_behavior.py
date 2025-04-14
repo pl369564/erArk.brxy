@@ -303,7 +303,13 @@ def handle_instruct_data(
         # 先结算口上
         talk.handle_talk(character_id)
         for effect_id in game_config.config_behavior_effect_data[behavior_id]:
-            constant.settle_behavior_effect_data[effect_id](character_id, add_time, change_data, now_time)
+            # 综合数值结算判定
+            # 如果effect_id是str类型，则说明是综合数值结算
+            if isinstance(effect_id, str) and "CVE" in effect_id:
+                effect_all_value_list = effect_id.split("_")[1:]
+                handle_comprehensive_value_effect(character_id, effect_all_value_list, change_data)
+            else:
+                constant.settle_behavior_effect_data[effect_id](character_id, add_time, change_data, now_time)
         # 如果是对他人的行为，则将自己的id与行动结束时间记录到对方的数据中
         if now_character_data.target_character_id != character_id:
             end_time = game_time.get_sub_date(minute=now_character_data.behavior.duration, old_date=now_character_data.behavior.start_time)
@@ -659,6 +665,7 @@ def check_unconscious_effect(
     change_data -- 状态变更信息记录对象
     now_time -- 结算时间
     """
+    from Script.Settle import default_experience
 
     character_data: game_type.Character = cache.character_data[character_id]
     target_character_id = character_data.target_character_id
@@ -677,27 +684,27 @@ def check_unconscious_effect(
             for experience_id in target_change.experience.copy():
                 # 普通部位
                 if experience_id in range(0, 8):
-                    # 根据经验序号转化为对应的结算序号
-                    effect_id = experience_id + 270
-                    constant.settle_behavior_effect_data[effect_id](character_id, add_time, change_data, now_time)
+                    # 根据经验序号转化为对应的经验id
+                    new_exp_id = experience_id + 70
+                    default_experience.base_chara_experience_common_settle(character_id, new_exp_id, target_flag=True, change_data = change_data)
                 # 绝顶经验
                 elif experience_id in range(10, 18):
-                    constant.settle_behavior_effect_data[278](character_id, add_time, change_data, now_time)
+                    default_experience.base_chara_experience_common_settle(character_id, 78, target_flag=True, change_data = change_data)
                 # 性交经验
                 elif experience_id in range(61, 65):
-                    constant.settle_behavior_effect_data[279](character_id, add_time, change_data, now_time)
+                    default_experience.base_chara_experience_common_settle(character_id, 79, target_flag=True, change_data = change_data)
                     # 睡姦经验与被睡姦经验
                     if handle_premise.handle_unconscious_flag_1(target_character_id):
-                        constant.settle_behavior_effect_data[352](character_id, add_time, change_data, now_time)
-                        constant.settle_behavior_effect_data[354](character_id, add_time, change_data, now_time)
+                        default_experience.base_chara_experience_common_settle(character_id, 120, change_data = change_data)
+                        default_experience.base_chara_experience_common_settle(character_id, 121, target_flag=True, change_data = change_data)
                     # 催眠姦经验与被催眠姦经验
                     elif handle_premise.handle_unconscious_hypnosis_flag(target_character_id):
-                        constant.settle_behavior_effect_data[358](character_id, add_time, change_data, now_time)
-                        constant.settle_behavior_effect_data[360](character_id, add_time, change_data, now_time)
+                        default_experience.base_chara_experience_common_settle(character_id, 126, change_data = change_data)
+                        default_experience.base_chara_experience_common_settle(character_id, 127, target_flag=True, change_data = change_data)
                     # 时姦经验与被时姦经验
                     elif handle_premise.handle_unconscious_flag_3(target_character_id) or handle_premise.handle_self_time_stop_orgasm_relase(target_character_id):
-                        constant.settle_behavior_effect_data[355](character_id, add_time, change_data, now_time)
-                        constant.settle_behavior_effect_data[357](character_id, add_time, change_data, now_time)
+                        default_experience.base_chara_experience_common_settle(character_id, 124, change_data = change_data)
+                        default_experience.base_chara_experience_common_settle(character_id, 125, target_flag=True, change_data = change_data)
 
     return target_character_data.sp_flag.unconscious_h
 
@@ -1334,6 +1341,9 @@ def item_effect(character_id: int, pl_to_npc: bool = False):
                     continue
                 character_data.second_behavior[num + i] = 1
 
+        # 绳子捆绑
+        if handle_premise.handle_self_now_bondage(character_id):
+            character_data.second_behavior[1161] = 1
 
 def handle_comprehensive_value_effect(character_id: int, effect_all_value_list: list, change_data: game_type.CharacterStatusChange = None) -> int:
     """

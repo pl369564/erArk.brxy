@@ -6,7 +6,7 @@ from typing import Set, List
 from types import FunctionType
 from threading import Thread
 from Script.Core import constant, constant_promise, cache_control, game_type, get_text, flow_handle
-from Script.Design import update, character, attr_calculation, character_handle, map_handle, handle_premise_place, character_behavior, handle_npc_ai, handle_premise
+from Script.Design import update, character, attr_calculation, character_handle, map_handle, handle_premise_place, character_behavior, handle_npc_ai, handle_npc_ai_in_h, handle_premise
 from Script.UI.Panel import normal_panel
 from Script.Config import normal_config, game_config
 from Script.UI.Moudle import draw
@@ -390,12 +390,6 @@ def see_dirty():
     cache.now_panel_id = constant.Panel.DIRTY
 
 
-@add_instruct(constant.Instruct.INSTRUCT_FILTER, constant.InstructType.SYSTEM, _("指令过滤"), {})
-def instruct_filter():
-    """处理指令过滤指令"""
-    cache.now_panel_id = constant.Panel.INSTRUCT_FILTER
-
-
 @add_instruct(constant.Instruct.DEBUG_MODE_ON, constant.InstructType.SYSTEM, _("开启DEBUG模式"),
               {constant_promise.Premise.DEBUG_MODE_SETTING_ON,
                constant_promise.Premise.DEBUG_MODE_OFF})
@@ -446,43 +440,17 @@ def handle_talk_quick_test():
 
 
 @add_instruct(
-    constant.Instruct.CHAT_AI_SETTING,
+    constant.Instruct.CHAT_WITH_AI,
     constant.InstructType.SYSTEM,
-    _("文本生成AI设置"),
+    _("与文本生成AI对话"),
     {
-        constant_promise.Premise.NOT_H,
+        constant_promise.Premise.AI_CHAT_ON,
+        constant_promise.Premise.HAVE_TARGET,
     })
-def handle_chat_ai_setting():
-    """文本生成AI设置"""
-    cache.now_panel_id = constant.Panel.CHAT_AI_SETTING
-
-
-@add_instruct(
-    constant.Instruct.COLLECTION_NOW_PLACE,
-    constant.InstructType.SYSTEM,
-    _("收藏该地点"),
-    {
-        constant_promise.Premise.NOT_H,
-        constant_promise.Premise.PLACE_NOT_IN_COLLECTION_LIST,
-    })
-def handle_collection_now_place():
-    """收藏该地点"""
-    pl_character_data: game_type.Character = cache.character_data[0]
-    cache.collect_position_list.append(pl_character_data.position)
-
-
-@add_instruct(
-    constant.Instruct.CANCEL_COLLECTION_NOW_PLACE,
-    constant.InstructType.SYSTEM,
-    _("取消收藏地点"),
-    {
-        constant_promise.Premise.NOT_H,
-        constant_promise.Premise.PALCE_IN_COLLECTION_LIST,
-    })
-def handle_cancel_collection_now_place():
-    """取消收藏地点"""
-    pl_character_data: game_type.Character = cache.character_data[0]
-    cache.collect_position_list.remove(pl_character_data.position)
+def handle_chat_with_ai():
+    """与文本生成AI对话"""
+    from Script.Design import handle_chat_ai
+    handle_chat_ai.direct_chat_with_ai()
 
 
 @add_instruct(
@@ -1138,6 +1106,7 @@ def handle_diary():
     constant.Instruct.SLEEP, constant.InstructType.DAILY, _("睡觉"),
     {constant_promise.Premise.IN_DORMITORY_OR_HOTEL,
      constant_promise.Premise.NOT_H,
+     constant_promise.Premise.TIME_STOP_OFF,
      constant_promise.Premise.TIRED_GE_75_OR_SLEEP_TIME},
     constant.CharacterStatus.STATUS_SLEEP,
 )
@@ -1617,6 +1586,54 @@ def handle_originium_arts():
 
 
 @add_instruct(
+    constant.Instruct.TARGET_TO_SELF,
+    constant.InstructType.SYSTEM,
+    _("对自己交互"),
+    {constant_promise.Premise.HAVE_TARGET,
+     constant_promise.Premise.NOT_H},
+)
+def handle_target_to_self():
+    """处理对自己交互指令"""
+    pl_character_data = cache.character_data[0]
+    pl_character_data.target_character_id = 0
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_WAIT, duration = 1)
+
+
+@add_instruct(
+    constant.Instruct.DOOR_LOCK_INNER,
+    constant.InstructType.SYSTEM,
+    _("锁上门内侧锁"),
+    {constant_promise.Premise.PLACE_DOOR_OPEN,
+     constant_promise.Premise.PLACE_DOOR_LOCKABLE},
+)
+def handle_door_lock_inner():
+    """处理锁上门内侧锁指令"""
+    pl_character_data = cache.character_data[0]
+    now_position = pl_character_data.position
+    now_scene_str = map_handle.get_map_system_path_str_for_list(now_position)
+    now_scene_data = cache.scene_data[now_scene_str]
+    now_scene_data.close_flag = now_scene_data.close_type
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_WAIT, duration = 1)
+
+
+@add_instruct(
+    constant.Instruct.DOOR_UNLOCK_INNER,
+    constant.InstructType.SYSTEM,
+    _("解开门内侧锁"),
+    {constant_promise.Premise.PLACE_DOOR_CLOSE,
+     constant_promise.Premise.PLACE_DOOR_LOCKABLE},
+)
+def handle_door_unlock_inner():
+    """处理解开门内侧锁指令"""
+    pl_character_data = cache.character_data[0]
+    now_position = pl_character_data.position
+    now_scene_str = map_handle.get_map_system_path_str_for_list(now_position)
+    now_scene_data = cache.scene_data[now_scene_str]
+    now_scene_data.close_flag = 0
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_WAIT, duration = 1)
+
+
+@add_instruct(
     constant.Instruct.CHARA_DIY_INSTRUCT,
     constant.InstructType.SYSTEM,
     _("角色特殊指令_特殊调用"),
@@ -1908,10 +1925,10 @@ def handle_collect():
 )
 def handle_do_h():
     """处理邀请H指令"""
-    character.init_character_behavior_start_time(0, cache.game_time)
     character_data: game_type.Character = cache.character_data[0]
     target_data = cache.character_data[character_data.target_character_id]
-    h_flag = False
+    now_draw = draw.WaitDraw()
+    now_draw.width = width
     if character.calculation_instuct_judege(0, character_data.target_character_id, _("H模式"))[0]:
         now_scene_str = map_handle.get_map_system_path_str_for_list(character_data.position)
         if cache.scene_data[now_scene_str].close_flag == 0:
@@ -1919,26 +1936,14 @@ def handle_do_h():
             door_return = now_draw.draw()
             if door_return == -1:
                 return
-        h_flag = True
         target_data.sp_flag.is_follow = 0
-        character_data.behavior.behavior_id = constant.Behavior.H
-        character_data.state = constant.CharacterStatus.STATUS_H
-        now_draw = draw.WaitDraw()
-        now_draw.width = width
         now_draw.text = _("\n进入H模式\n")
         now_draw.draw()
-
+        chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_H)
     else:
-        character_data.behavior.behavior_id = constant.Behavior.DO_H_FAIL
-        character_data.state = constant.CharacterStatus.STATUS_DO_H_FAIL
-    character_data.behavior.duration = 5
-    update.game_update_flow(5)
-
-    if not h_flag:
-        now_draw = draw.WaitDraw()
-        now_draw.width = width
         now_draw.text = _("\n进入H模式失败\n")
         now_draw.draw()
+        chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_DO_H_FAIL)
 
 
 @add_instruct(
@@ -2023,7 +2028,6 @@ def handle_stop_sleep_obscenity():
 )
 def handle_unconscious_h():
     """处理无意识奸指令"""
-    character.init_character_behavior_start_time(0, cache.game_time)
     character_data: game_type.Character = cache.character_data[0]
     target_data = cache.character_data[character_data.target_character_id]
     now_scene_str = map_handle.get_map_system_path_str_for_list(character_data.position)
@@ -2033,15 +2037,11 @@ def handle_unconscious_h():
         if door_return == -1:
             return
     target_data.sp_flag.is_follow = 0
-    character_data.behavior.behavior_id = constant.Behavior.H
-    character_data.state = constant.CharacterStatus.STATUS_H
     now_draw = draw.WaitDraw()
     now_draw.width = width
     now_draw.text = _("\n进入无意识奸模式\n")
     now_draw.draw()
-
-    character_data.behavior.duration = 5
-    update.game_update_flow(5)
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_H)
 
 
 @add_instruct(
@@ -2064,6 +2064,35 @@ def handle_do_h_in_love_hotel():
     target_data = cache.character_data[character_data.target_character_id]
     target_data.h_state.h_in_love_hotel = True
     handle_do_h()
+
+
+@add_instruct(
+    constant.Instruct.ASK_HIDDEN_SEX,
+    constant.InstructType.OBSCENITY,
+    _("邀请隐奸"),
+    {constant_promise.Premise.HAVE_TARGET,
+     constant_promise.Premise.TO_DO,
+     constant_promise.Premise.NOT_H,
+     constant_promise.Premise.NO_TARGET_OR_TARGET_CAN_COOPERATE,
+     constant_promise.Premise.TIRED_LE_74},
+    constant.CharacterStatus.STATUS_ASK_HIDDEN_SEX,
+)
+def handle_ask_hidden_sex():
+    """处理邀请隐奸指令"""
+    from Script.UI.Panel.Select_Hidden_Sex_Mode_Panel import Select_Hidden_Sex_Mode_Panel
+    character_data: game_type.Character = cache.character_data[0]
+    target_data = cache.character_data[character_data.target_character_id]
+    if character.calculation_instuct_judege(0, character_data.target_character_id, _("隐奸"))[0]:
+        target_data.sp_flag.is_follow = 0
+        now_panel = Select_Hidden_Sex_Mode_Panel(width)
+        now_panel.draw()
+        chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_ASK_HIDDEN_SEX)
+    else:
+        now_draw = draw.WaitDraw()
+        now_draw.width = width
+        now_draw.text = _("\n邀请隐奸失败\n")
+        now_draw.draw()
+        chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_ASK_HIDDEN_SEX_FAIL)
 
 
 @add_instruct(
@@ -3135,7 +3164,7 @@ def handle_raise_skirt():
     _("索要内裤"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.NOT_H,
-     constant_promise.Premise.T_NORMAL_56_OR_UNCONSCIOUS_FLAG,
+     constant_promise.Premise.T_NORMAL_6,
      constant_promise.Premise.TARGET_WEAR_PAN,
      constant_promise.Premise.COLLECT_BONUS_102,
      constant_promise.Premise.TIRED_LE_84},
@@ -3152,7 +3181,7 @@ def handle_ask_for_pan():
     _("索要袜子"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.NOT_H,
-     constant_promise.Premise.T_NORMAL_56_OR_UNCONSCIOUS_FLAG,
+     constant_promise.Premise.T_NORMAL_6,
      constant_promise.Premise.TARGET_WEAR_SOCKS,
      constant_promise.Premise.COLLECT_BONUS_202,
      constant_promise.Premise.TIRED_LE_84},
@@ -3368,6 +3397,7 @@ def handle_making_out():
     _("接吻"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_GAG,
      constant_promise.Premise.IS_H},
     constant.CharacterStatus.STATUS_KISS_H,
 )
@@ -3536,6 +3566,7 @@ def handle_anal_caress():
     _("命令对方自慰"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.IS_H},
     constant.CharacterStatus.STATUS_MAKE_MASTUREBATE,
 )
@@ -3550,6 +3581,8 @@ def handle_make_masturebate():
     _("命令对方舔自己肛门"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
+     constant_promise.Premise.TARGET_NOT_GAG,
      constant_promise.Premise.IS_H},
     constant.CharacterStatus.STATUS_MAKE_LICK_ANAL,
 )
@@ -3566,6 +3599,7 @@ def handle_make_lick_anal():
      constant_promise.Premise.T_NORMAL_5_6,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
      constant_promise.Premise.GROUP_SEX_MODE_OFF,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.IS_H},
 )
 def handle_change_top_and_bottom():
@@ -3573,7 +3607,7 @@ def handle_change_top_and_bottom():
     character_data: game_type.Character = cache.character_data[0]
     target_character_data: game_type.Character = cache.character_data[character_data.target_character_id]
     target_character_data.h_state.npc_active_h = True
-    handle_npc_ai.npc_active_h()
+    handle_npc_ai_in_h.npc_active_h()
 
 
 @add_instruct(
@@ -3586,7 +3620,7 @@ def handle_change_top_and_bottom():
 )
 def handle_keep_enjoy():
     """处理继续享受指令"""
-    handle_npc_ai.npc_active_h()
+    handle_npc_ai_in_h.npc_active_h()
 
 
 @add_instruct(
@@ -3625,6 +3659,7 @@ def handle_sedecu():
     _("手交"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.IS_H},
     constant.CharacterStatus.STATUS_HANDJOB,
     constant.SexInstructSubType.WAIT_UPON,
@@ -3640,6 +3675,7 @@ def handle_handjob():
     _("口交"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_GAG,
      constant_promise.Premise.IS_H},
     constant.CharacterStatus.STATUS_BLOWJOB,
     constant.SexInstructSubType.WAIT_UPON,
@@ -3655,6 +3691,7 @@ def handle_blowjob():
     _("乳交"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.IS_H},
     constant.CharacterStatus.STATUS_PAIZURI,
     constant.SexInstructSubType.WAIT_UPON,
@@ -3703,6 +3740,7 @@ def handle_hairjob():
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
      constant_promise.Premise.IS_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.TARGET_TECHNIQUE_GE_5},
     constant.CharacterStatus.STATUS_AXILLAJOB,
     constant.SexInstructSubType.WAIT_UPON,
@@ -3718,6 +3756,7 @@ def handle_axillajob():
     _("素股"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.IS_H},
     constant.CharacterStatus.STATUS_RUB_BUTTOCK,
     constant.SexInstructSubType.WAIT_UPON,
@@ -3733,8 +3772,10 @@ def handle_rub_buttock():
     _("手交口交"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_GAG,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.PENIS_IN_T_MOUSE_OR_HAND,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.TARGET_TECHNIQUE_GE_3},
     constant.CharacterStatus.STATUS_HAND_BLOWJOB,
     constant.SexInstructSubType.WAIT_UPON,
@@ -3750,8 +3791,10 @@ def handle_hand_blowjob():
     _("乳交口交"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_GAG,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.PENIS_IN_T_MOUSE_OR_BREAST,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.TARGET_TECHNIQUE_GE_3},
     constant.CharacterStatus.STATUS_TITS_BLOWJOB,
     constant.SexInstructSubType.WAIT_UPON,
@@ -3767,6 +3810,7 @@ def handle_tits_blowjob():
     _("真空口交"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_GAG,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.PENIS_IN_T_MOUSE,
      constant_promise.Premise.TARGET_TECHNIQUE_GE_5},
@@ -3784,6 +3828,7 @@ def handle_focus_blowjob():
     _("深喉插入"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_GAG,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.PENIS_IN_T_MOUSE,
      constant_promise.Premise.TARGET_TECHNIQUE_GE_5_OR_IS_UNCONSCIOUS_H},
@@ -3801,6 +3846,7 @@ def handle_deep_throat():
     _("清洁口交"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_GAG,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.PL_PENIS_SEMEN_DIRTY,
      constant_promise.Premise.NOW_NOT_CONDOM,
@@ -3819,10 +3865,12 @@ def handle_clean_blowjob():
     _("六九式"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_GAG,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.PLACE_FURNITURE_3,
      constant_promise.Premise.PENIS_IN_T_MOUSE,
      constant_promise.Premise.TECHNIQUE_GE_3,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.TARGET_TECHNIQUE_GE_3},
     constant.CharacterStatus.STATUS_SIXTY_NINE,
     constant.SexInstructSubType.WAIT_UPON,
@@ -4330,7 +4378,7 @@ def handle_vibrator_insertion_anal_off():
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.HAVE_CLYSTER_TOOLS,
-     constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
+     constant_promise.Premise.IN_HUMILIATION_ROOM,
      constant_promise.Premise.T_NOT_ENEMA,
      constant_promise.Premise.HAVE_ENEMAS},
     constant.CharacterStatus.STATUS_CLYSTER,
@@ -4349,7 +4397,7 @@ def handle_clyster():
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.HAVE_CLYSTER_TOOLS,
-     constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
+     constant_promise.Premise.IN_HUMILIATION_ROOM,
      constant_promise.Premise.T_ENEMA,
      constant_promise.Premise.T_ENEMA_CAPACITY_L_5,
      constant_promise.Premise.HAVE_ENEMAS},
@@ -4509,33 +4557,36 @@ def handle_urine_collector_off():
 @add_instruct(
     constant.Instruct.BONDAGE,
     constant.InstructType.SEX,
-    _("绳子_未实装"),
+    _("绳艺"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
      constant_promise.Premise.IS_H,
-     constant_promise.Premise.TO_DO,
-     constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
+     constant_promise.Premise.IN_HUMILIATION_ROOM,
      constant_promise.Premise.HAVE_BONDAGE},
-    constant.CharacterStatus.STATUS_BONDAGE,
+    constant.CharacterStatus.STATUS_BIND,
     constant.SexInstructSubType.SM,
 )
 def handle_bondage():
-    """处理绳子指令"""
-    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BONDAGE, judge = _("SM"))
+    """处理绳艺指令"""
+    from Script.UI.Panel import normal_panel
+    now_panel = normal_panel.Bondage_Panel(width=width)
+    now_panel.draw()
 
 
 @add_instruct(
     constant.Instruct.PATCH_ON,
     constant.InstructType.SEX,
     _("戴上眼罩"),
-    {constant_promise.Premise.HAVE_TARGET,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.IS_H,
-     constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
-     constant_promise.Premise.TARGET_NOT_PATCH,
-     constant_promise.Premise.HAVE_PATCH},
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
+        constant_promise.Premise.TARGET_NOT_PATCH,
+        constant_promise.Premise.HAVE_PATCH
+        },
     constant.CharacterStatus.STATUS_PATCH_ON,
-    constant.SexInstructSubType.ITEM,
+    constant.SexInstructSubType.SM,
 )
 def handle_patch_on():
     """处理戴上眼罩指令"""
@@ -4546,14 +4597,16 @@ def handle_patch_on():
     constant.Instruct.PATCH_OFF,
     constant.InstructType.SEX,
     _("摘下眼罩"),
-    {constant_promise.Premise.HAVE_TARGET,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.IS_H,
-     constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
-     constant_promise.Premise.TARGET_NOW_PATCH,
-     constant_promise.Premise.HAVE_PATCH},
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
+        constant_promise.Premise.TARGET_NOW_PATCH,
+        constant_promise.Premise.HAVE_PATCH
+        },
     constant.CharacterStatus.STATUS_PATCH_OFF,
-    constant.SexInstructSubType.ITEM,
+    constant.SexInstructSubType.SM,
 )
 def handle_patch_off():
     """处理摘下眼罩指令"""
@@ -4561,14 +4614,56 @@ def handle_patch_off():
 
 
 @add_instruct(
+    constant.Instruct.GAG_ON,
+    constant.InstructType.SEX,
+    _("戴上口球"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
+        constant_promise.Premise.TARGET_NOT_GAG,
+        constant_promise.Premise.HAVE_GAG,
+        },
+    constant.CharacterStatus.STATUS_GAG_ON,
+    constant.SexInstructSubType.SM,
+)
+def handle_gag_on():
+    """处理戴上口球指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_GAG_ON)
+
+
+@add_instruct(
+    constant.Instruct.GAG_OFF,
+    constant.InstructType.SEX,
+    _("摘下口球"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
+        constant_promise.Premise.TARGET_NOW_GAG,
+        constant_promise.Premise.HAVE_GAG,
+        },
+    constant.CharacterStatus.STATUS_GAG_OFF,
+    constant.SexInstructSubType.SM,
+)
+def handle_gag_off():
+    """处理摘下口球指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_GAG_OFF)
+
+
+@add_instruct(
     constant.Instruct.WHIP,
     constant.InstructType.SEX,
     _("鞭子"),
-    {constant_promise.Premise.HAVE_TARGET,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.IS_H,
-     constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
-     constant_promise.Premise.HAVE_WHIP},
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.IN_HUMILIATION_ROOM,
+        constant_promise.Premise.HAVE_WHIP
+        },
     constant.CharacterStatus.STATUS_WHIP,
     constant.SexInstructSubType.SM,
 )
@@ -4585,7 +4680,7 @@ def handle_whip():
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.TO_DO,
-     constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
+     constant_promise.Premise.IN_HUMILIATION_ROOM,
      constant_promise.Premise.HAVE_NEEDLE},
     constant.CharacterStatus.STATUS_NEEDLE,
     constant.SexInstructSubType.SM,
@@ -4599,10 +4694,12 @@ def handle_neddle():
     constant.Instruct.PUT_CONDOM,
     constant.InstructType.SEX,
     _("戴上避孕套"),
-    {constant_promise.Premise.IS_H,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.NOW_NOT_CONDOM,
-     constant_promise.Premise.HAVE_CONDOM},
+    {
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.NOW_NOT_CONDOM,
+        constant_promise.Premise.HAVE_CONDOM
+        },
     constant.CharacterStatus.STATUS_PUT_CONDOM,
     constant.SexInstructSubType.ITEM,
 )
@@ -4615,9 +4712,10 @@ def handle_put_condom():
     constant.Instruct.TAKE_CONDOM_OUT,
     constant.InstructType.SEX,
     _("摘掉避孕套"),
-    {constant_promise.Premise.IS_H,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.NOW_CONDOM,
+    {
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.NOW_CONDOM,
     },
     constant.CharacterStatus.STATUS_TAKE_CONDOM_OUT,
     constant.SexInstructSubType.ITEM,
@@ -4631,11 +4729,13 @@ def handle_take_condom_out():
     constant.Instruct.SAFE_CANDLES,
     constant.InstructType.SEX,
     _("滴蜡"),
-    {constant_promise.Premise.HAVE_TARGET,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.IS_H,
-     constant_promise.Premise.IN_HUMILIATION_ROOM_OR_DR_ROOM,
-     constant_promise.Premise.HAVE_SAFE_CANDLES},
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.IN_HUMILIATION_ROOM,
+        constant_promise.Premise.HAVE_SAFE_CANDLES
+        },
     constant.CharacterStatus.STATUS_SAFE_CANDLES,
     constant.SexInstructSubType.SM,
 )
@@ -4824,9 +4924,10 @@ def handle_back_sex():
 @add_instruct(
     constant.Instruct.RIDING_SEX,
     constant.InstructType.SEX,
-    _("骑乘位"),
+    _("对面骑乘位"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.PLACE_FURNITURE_3,
      constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
@@ -4834,18 +4935,36 @@ def handle_back_sex():
     constant.SexInstructSubType.INSERT,
 )
 def handle_riding_sex():
-    """处理骑乘位指令"""
+    """处理对面骑乘位指令"""
     chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_RIDING_SEX, judge = _("性交"))
+
+@add_instruct(
+    constant.Instruct.BACK_RIDING_SEX,
+    constant.InstructType.SEX,
+    _("背面骑乘位"),
+    {constant_promise.Premise.HAVE_TARGET,
+     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
+     constant_promise.Premise.IS_H,
+     constant_promise.Premise.PLACE_FURNITURE_3,
+     constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
+    constant.CharacterStatus.STATUS_BACK_RIDING_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_back_riding_sex():
+    """处理背面骑乘位指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BACK_RIDING_SEX, judge = _("性交"))
 
 @add_instruct(
     constant.Instruct.FACE_SEAT_SEX,
     constant.InstructType.SEX,
     _("对面座位"),
-    {constant_promise.Premise.HAVE_TARGET,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.IS_H,
-     constant_promise.Premise.PLACE_FURNITURE_GE_2,
-     constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.PLACE_FURNITURE_GE_2,
+        constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
     constant.CharacterStatus.STATUS_FACE_SEAT_SEX,
     constant.SexInstructSubType.INSERT,
 )
@@ -4857,11 +4976,12 @@ def handle_face_seat_sex():
     constant.Instruct.BACK_SEAT_SEX,
     constant.InstructType.SEX,
     _("背面座位"),
-    {constant_promise.Premise.HAVE_TARGET,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.IS_H,
-     constant_promise.Premise.PLACE_FURNITURE_GE_2,
-     constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.PLACE_FURNITURE_GE_2,
+        constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
     constant.CharacterStatus.STATUS_BACK_SEAT_SEX,
     constant.SexInstructSubType.INSERT,
 )
@@ -4873,10 +4993,11 @@ def handle_back_seat_sex():
     constant.Instruct.FACE_STAND_SEX,
     constant.InstructType.SEX,
     _("对面立位"),
-    {constant_promise.Premise.HAVE_TARGET,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.IS_H,
-     constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
     constant.CharacterStatus.STATUS_FACE_STAND_SEX,
     constant.SexInstructSubType.INSERT,
 )
@@ -4888,16 +5009,83 @@ def handle_face_stand_sex():
     constant.Instruct.BACK_STAND_SEX,
     constant.InstructType.SEX,
     _("背面立位"),
-    {constant_promise.Premise.HAVE_TARGET,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.IS_H,
-     constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
     constant.CharacterStatus.STATUS_BACK_STAND_SEX,
     constant.SexInstructSubType.INSERT,
 )
 def handle_back_stand_sex():
     """处理背面立位指令"""
     chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BACK_STAND_SEX, judge = _("性交"))
+
+@add_instruct(
+    constant.Instruct.FACE_HUG_SEX,
+    constant.InstructType.SEX,
+    _("对面抱位"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
+    constant.CharacterStatus.STATUS_FACE_HUG_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_face_hug_sex():
+    """处理对面抱位指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_FACE_HUG_SEX, judge=_("性交"))
+
+@add_instruct(
+    constant.Instruct.BACK_HUG_SEX,
+    constant.InstructType.SEX,
+    _("背面抱位"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
+    constant.CharacterStatus.STATUS_BACK_HUG_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_back_hug_sex():
+    """处理背面抱位指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BACK_HUG_SEX, judge=_("性交"))
+
+@add_instruct(
+    constant.Instruct.FACE_LAY_SEX,
+    constant.InstructType.SEX,
+    _("对面卧位"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.PLACE_FURNITURE_3,
+        constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
+    constant.CharacterStatus.STATUS_FACE_LAY_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_face_lay_sex():
+    """处理对面卧位指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_FACE_LAY_SEX, judge=_("性交"))
+
+@add_instruct(
+    constant.Instruct.BACK_LAY_SEX,
+    constant.InstructType.SEX,
+    _("背面卧位"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.PLACE_FURNITURE_3,
+        constant_promise.Premise.TARGET_NOT_VIBRATOR_INSERTION},
+    constant.CharacterStatus.STATUS_BACK_LAY_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_back_lay_sex():
+    """处理背面卧位指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BACK_LAY_SEX, judge=_("性交"))
 
 @add_instruct(
     constant.Instruct.STIMULATE_G_POINT,
@@ -5001,13 +5189,13 @@ def handle_back_anal_sex():
     """处理后背位肛交指令"""
     chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BACK_ANAL_SEX, judge = _("A性交"))
 
-
 @add_instruct(
     constant.Instruct.RIDING_ANAL_SEX,
     constant.InstructType.SEX,
-    _("骑乘位肛交"),
+    _("对面骑乘位肛交"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
      constant_promise.Premise.IS_H,
      constant_promise.Premise.PLACE_FURNITURE_3,
      constant_promise.Premise.TARGET_A_EMPTY},
@@ -5015,8 +5203,25 @@ def handle_back_anal_sex():
     constant.SexInstructSubType.INSERT,
 )
 def handle_riding_anal_sex():
-    """处理骑乘位肛交指令"""
+    """处理对面骑乘位肛交指令"""
     chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_RIDING_ANAL_SEX, judge = _("A性交"))
+
+@add_instruct(
+    constant.Instruct.BACK_RIDING_ANAL_SEX,
+    constant.InstructType.SEX,
+    _("背面骑乘位肛交"),
+    {constant_promise.Premise.HAVE_TARGET,
+     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+     constant_promise.Premise.TARGET_NOT_BONDAGE,
+     constant_promise.Premise.IS_H,
+     constant_promise.Premise.PLACE_FURNITURE_3,
+     constant_promise.Premise.TARGET_A_EMPTY},
+    constant.CharacterStatus.STATUS_BACK_RIDING_ANAL_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_back_riding_anal_sex():
+    """处理背面骑乘位肛交指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BACK_RIDING_ANAL_SEX, judge = _("A性交"))
 
 @add_instruct(
     constant.Instruct.FACE_SEAT_ANAL_SEX,
@@ -5079,6 +5284,77 @@ def handle_face_stand_anal_sex():
 def handle_back_stand_anal_sex():
     """处理背面立位肛交指令"""
     chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BACK_STAND_ANAL_SEX, judge = _("A性交"))
+
+
+@add_instruct(
+    constant.Instruct.FACE_HUG_ANAL_SEX,
+    constant.InstructType.SEX,
+    _("对面抱位肛交"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.TARGET_A_EMPTY,
+    },
+    constant.CharacterStatus.STATUS_FACE_HUG_ANAL_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_face_hug_anal_sex():
+    """处理对面抱位肛交指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_FACE_HUG_ANAL_SEX, judge=_("A性交"))
+
+@add_instruct(
+    constant.Instruct.BACK_HUG_ANAL_SEX,
+    constant.InstructType.SEX,
+    _("背面抱位肛交"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.TARGET_A_EMPTY,
+    },
+    constant.CharacterStatus.STATUS_BACK_HUG_ANAL_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_back_hug_anal_sex():
+    """处理背面抱位肛交指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BACK_HUG_ANAL_SEX, judge=_("A性交"))
+
+@add_instruct(
+    constant.Instruct.FACE_LAY_ANAL_SEX,
+    constant.InstructType.SEX,
+    _("对面卧位肛交"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.PLACE_FURNITURE_3,
+        constant_promise.Premise.TARGET_A_EMPTY,
+    },
+    constant.CharacterStatus.STATUS_FACE_LAY_ANAL_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_face_lay_anal_sex():
+    """处理对面卧位肛交指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_FACE_LAY_ANAL_SEX, judge=_("A性交"))
+
+@add_instruct(
+    constant.Instruct.BACK_LAY_ANAL_SEX,
+    constant.InstructType.SEX,
+    _("背面卧位肛交"),
+    {
+        constant_promise.Premise.HAVE_TARGET,
+        constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
+        constant_promise.Premise.IS_H,
+        constant_promise.Premise.PLACE_FURNITURE_3,
+        constant_promise.Premise.TARGET_A_EMPTY,
+    },
+    constant.CharacterStatus.STATUS_BACK_LAY_ANAL_SEX,
+    constant.SexInstructSubType.INSERT,
+)
+def handle_back_lay_anal_sex():
+    """处理背面卧位肛交指令"""
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_BACK_LAY_ANAL_SEX, judge=_("A性交"))
 
 @add_instruct(
     constant.Instruct.STIMULATE_SIGMOID_COLON,
@@ -5205,6 +5481,7 @@ def handle_ask_pee():
     """处理命令对方小便指令"""
     chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_ASK_PEE, judge = _("严重骚扰"))
 
+
 @add_instruct(
     constant.Instruct.BEAT_BREAST,
     constant.InstructType.SEX,
@@ -5226,19 +5503,16 @@ def handle_beat_breast():
 @add_instruct(
     constant.Instruct.SPANKING,
     constant.InstructType.SEX,
-    _("打屁股_未实装"),
+    _("打屁股"),
     {constant_promise.Premise.HAVE_TARGET,
      constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.TO_DO,
      constant_promise.Premise.IS_H},
+    constant.CharacterStatus.STATUS_SPANKING,
     constant.SexInstructSubType.SM,
 )
 def handle_spanking():
     """处理打屁股指令"""
-    character.init_character_behavior_start_time(0, cache.game_time)
-    character_data: game_type.Character = cache.character_data[0]
-    character_data.behavior.duration = 5
-    update.game_update_flow(5)
+    chara_handle_instruct_common_settle(constant.CharacterStatus.STATUS_SPANKING)
 
 
 @add_instruct(
@@ -5252,23 +5526,6 @@ def handle_spanking():
 )
 def handle_shame_play():
     """处理羞耻play指令"""
-    character.init_character_behavior_start_time(0, cache.game_time)
-    character_data: game_type.Character = cache.character_data[0]
-    character_data.behavior.duration = 5
-    update.game_update_flow(5)
-
-
-@add_instruct(
-    constant.Instruct.BUNDLED_PLAY,
-    constant.InstructType.SEX,
-    _("拘束play_未实装"),
-    {constant_promise.Premise.HAVE_TARGET,
-     constant_promise.Premise.T_NPC_NOT_ACTIVE_H,
-     constant_promise.Premise.IS_H,
-     constant_promise.Premise.TO_DO},
-)
-def handle_bundled_play():
-    """处理拘束play指令"""
     character.init_character_behavior_start_time(0, cache.game_time)
     character_data: game_type.Character = cache.character_data[0]
     character_data.behavior.duration = 5
